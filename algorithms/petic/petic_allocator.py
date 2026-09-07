@@ -48,8 +48,8 @@ class PeticAllocator(SliceAllocator):
                 return math.inf
 
             edge = frozenset([
-                link.source,
-                link.target
+                link.source.name,
+                link.target.name
             ])
 
             if (
@@ -69,7 +69,7 @@ class PeticAllocator(SliceAllocator):
             destination=request.destination.name,
             cost_function=cost_function
         )
-        print(path)
+
         if path is None:
             return SliceResult(
                 request_id=request.id,

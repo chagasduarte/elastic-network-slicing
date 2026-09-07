@@ -13,10 +13,10 @@ class NetworkGraph:
     def links(self) -> list[Link]:
         return self._links.copy()
 
-    def add_Node(self, node: Node) -> None:
+    def add_node(self, node: Node) -> None:
         self._nodes.add(node)
 
-    def add_Nodes(self, nodes: list[Node]) -> None:
+    def add_nodes(self, nodes: list[Node]) -> None:
             for node in nodes:
                 self._nodes.add(node)
 
