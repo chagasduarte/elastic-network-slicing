@@ -7,6 +7,7 @@ from domain.slice_request import SliceRequest
 from pathfinding.dijkstra_path_finder import DijkstraPathFinder
 from services.bandwidth_reservation_service import BandwidthReservationService
 from contracts.create_topo import create_topo
+from domain.node import Node
 
 def main():
     # ---------------------------------------------------------
@@ -22,8 +23,8 @@ def main():
 
     request = SliceRequest(
         id="request-1",
-        source="A",
-        destination="E",
+        source=Node("A"),
+        destination=Node("E"),
         demands=[
             SliceDemand(
                 id="t1",
@@ -90,7 +91,6 @@ def main():
         "Caminho:",
         " -> ".join(result.path)
     )
-    print(graph.get_links())
 
     # ---------------------------------------------------------
     # 6. Converte o caminho para objetos Link
@@ -126,11 +126,18 @@ def main():
     print("\n--- ESTADO DOS ENLACES ---")
 
     for link in graph.links:
+        allocated = link.allocated_bandwidth_at(
+            result.demand_id
+        )
+
+        available = link.available_bandwidth_at(
+            result.demand_id
+        )
         print(
-            f"{link.source} <-> {link.target} | "
+            f"{link.source.name} <-> {link.target.name} | "
             f"Capacidade: {link.capacity} Mbps | "
-            f"Alocado: {link.allocated_bandwidth} Mbps | "
-            f"Disponível: {link.available_bandwidth} Mbps"
+            f"Alocado: {allocated} Mbps | "
+            f"Disponível: {available} Mbps"
         )
 
 

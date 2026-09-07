@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from domain.link_allocation import LinkAllocation
 from domain.node import Node
 
+
 @dataclass
 class Link:
     source: Node
@@ -18,28 +19,46 @@ class Link:
                 "A capacidade do enlace deve ser maior que zero."
             )
 
-    @property
-    def allocated_bandwidth(self) -> int:
+    def allocated_bandwidth_at(
+        self,
+        demand_id: str
+    ) -> int:
         return sum(
             allocation.bandwidth
             for allocation in self.allocations
+            if allocation.demand_id == demand_id
         )
 
-    @property
-    def available_bandwidth(self) -> int:
-        return self.capacity - self.allocated_bandwidth
+    def available_bandwidth_at(
+        self,
+        demand_id: str
+    ) -> int:
+        return (
+            self.capacity
+            - self.allocated_bandwidth_at(demand_id)
+        )
 
-    def supports(self, bandwidth: int) -> bool:
-        return self.available_bandwidth >= bandwidth
+    def supports(
+        self,
+        demand_id: str,
+        bandwidth: int
+    ) -> bool:
+        return (
+            self.available_bandwidth_at(demand_id)
+            >= bandwidth
+        )
 
     def reserve(
         self,
         allocation: LinkAllocation
     ) -> None:
-
-        if not self.supports(allocation.bandwidth):
+        if not self.supports(
+            allocation.demand_id,
+            allocation.bandwidth
+        ):
             raise ValueError(
-                f"O enlace {self.source}-{self.target} "
+                f"O enlace "
+                f"{self.source.id}-{self.target.id} "
                 "não possui banda suficiente."
             )
 

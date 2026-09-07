@@ -2,6 +2,7 @@ import math
 
 from contracts.link_weight_calculator import LinkWeightCalculator
 from domain.link import Link
+from domain.slice_demand import SliceDemand
 
 
 class PeticWeightCalculator(LinkWeightCalculator):
@@ -9,12 +10,16 @@ class PeticWeightCalculator(LinkWeightCalculator):
     def calculate(
         self,
         link: Link,
-        bandwidth: int
+        demand: SliceDemand
     ) -> float:
 
-        if not link.supports(bandwidth):
+        available = link.available_bandwidth_at(
+            demand.id
+        )
+
+        if available < demand.bandwidth:
             return math.inf
 
         return math.exp(
-            bandwidth / link.available_bandwidth
+            demand.bandwidth / available
         )

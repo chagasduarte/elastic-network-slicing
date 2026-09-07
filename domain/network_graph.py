@@ -13,6 +13,13 @@ class NetworkGraph:
     def links(self) -> list[Link]:
         return self._links.copy()
 
+    def add_Node(self, node: Node) -> None:
+        self._nodes.add(node)
+
+    def add_Nodes(self, nodes: list[Node]) -> None:
+            for node in nodes:
+                self._nodes.add(node)
+
     def add_link(self, link: Link) -> None:
         self._nodes.add(link.source)
         self._nodes.add(link.target)
@@ -20,24 +27,18 @@ class NetworkGraph:
         self._links.append(link)
 
     def get_neighbors(
-            
         self,
-        node: str
-    ) -> list[tuple[str, Link]]:
+        node: Node
+    ) -> list[tuple[Node, Link]]:
 
         neighbors = []
 
         for link in self._links:
-
             if link.source == node:
-                neighbors.append(
-                    (link.target, link)
-                )
+                neighbors.append((link.target, link))
 
             elif link.target == node:
-                neighbors.append(
-                    (link.source, link)
-                )
+                neighbors.append((link.source, link))
 
         return neighbors
 
@@ -46,7 +47,7 @@ class NetworkGraph:
         path: list[str]
     ) -> list[Link]:
 
-        links = []
+        links: list[Link] = []
 
         for index in range(len(path) - 1):
             source = path[index]
@@ -74,11 +75,14 @@ class NetworkGraph:
 
         for link in self._links:
             if (
-                link.source == source
-                and link.target == target
-            ) or (
-                link.source == target
-                and link.target == source
+                link.source.name == source
+                and link.target.name == target
+            ):
+                return link
+
+            if (
+                link.source.name == target
+                and link.target.name == source
             ):
                 return link
 
@@ -86,4 +90,11 @@ class NetworkGraph:
 
     def get_links(self):
         return self._links;
+
+    def get_node(self, name: str) -> Node | None:
+        for node in self._nodes:
+            if node.name == name:
+                return node
+
+        return None
     

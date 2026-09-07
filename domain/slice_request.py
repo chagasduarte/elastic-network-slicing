@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from domain.slice_demand import SliceDemand
+from domain.node import Node
 
 
 @dataclass(frozen=True)
 class SliceRequest:
     id: str
-    source: str
-    destination: str
+    source: Node
+    destination: Node
     demands: list[SliceDemand]
 
     def demand_at(self, period_id: str) -> SliceDemand:

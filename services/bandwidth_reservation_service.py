@@ -22,7 +22,7 @@ class BandwidthReservationService:
     ) -> None:
 
         for link in links:
-            if not link.supports(allocation.bandwidth):
+            if not link.supports(allocation.demand_id ,allocation.bandwidth):
                 raise ValueError(
                     f"O enlace {link.source}-{link.target} "
                     f"não possui {allocation.bandwidth} Mbps disponíveis."

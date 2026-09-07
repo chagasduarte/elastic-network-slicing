@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from domain.node import Node
 
 @dataclass(frozen=True)
 class SliceResult:

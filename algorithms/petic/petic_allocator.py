@@ -44,7 +44,7 @@ class PeticAllocator(SliceAllocator):
 
         def cost_function(link: Link) -> float:
 
-            if not link.supports(demand.bandwidth):
+            if not link.supports(demand.id, demand.bandwidth):
                 return math.inf
 
             edge = frozenset([
@@ -60,16 +60,16 @@ class PeticAllocator(SliceAllocator):
 
             return self._weight_calculator.calculate(
                 link,
-                demand.bandwidth
+                demand
             )
 
         path = self._path_finder.find(
             graph=graph,
-            source=request.source,
-            destination=request.destination,
+            source=request.source.name,
+            destination=request.destination.name,
             cost_function=cost_function
         )
-
+        print(path)
         if path is None:
             return SliceResult(
                 request_id=request.id,

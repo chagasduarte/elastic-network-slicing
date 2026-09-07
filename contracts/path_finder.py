@@ -3,7 +3,7 @@ from collections.abc import Callable
 
 from domain.link import Link
 from domain.network_graph import NetworkGraph
-
+from domain.node import Node
 
 class PathFinder(ABC):
 
@@ -11,8 +11,8 @@ class PathFinder(ABC):
     def find(
         self,
         graph: NetworkGraph,
-        source: str,
-        destination: str,
+        source: Node,
+        destination: Node,
         cost_function: Callable[[Link], float]
     ) -> list[str] | None:
         pass
