@@ -6,7 +6,7 @@ from domain.slice_demand import SliceDemand
 from domain.slice_request import SliceRequest
 from pathfinding.dijkstra_path_finder import DijkstraPathFinder
 from services.bandwidth_reservation_service import BandwidthReservationService
-from contracts.create_topo import create_topo
+from contracts.create_topo import create_test_graph
 from domain.node import Node
 
 def main():
@@ -14,7 +14,7 @@ def main():
     # 1. Criação da topologia
     # ---------------------------------------------------------
 
-    graph = create_topo()
+    graph = create_test_graph()
 
     
     # ---------------------------------------------------------
