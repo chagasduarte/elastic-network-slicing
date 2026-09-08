@@ -1,4 +1,5 @@
 from algorithms.petic.petic_allocator import PeticAllocator
+from algorithms.aco.aco_allocator import AcoAllocator
 from algorithms.petic.petic_weight_calculator import PeticWeightCalculator
 from domain.link_allocation import LinkAllocation
 from domain.slice_demand import SliceDemand
@@ -43,22 +44,26 @@ def main():
             )
         ]
     )
-
     # ---------------------------------------------------------
-    # 3. Dependências do PETIC
+    # 3. Dependências do ACO
     # ---------------------------------------------------------
+    allocator = AcoAllocator()
 
-    path_finder = DijkstraPathFinder()
+    # # ---------------------------------------------------------
+    # # 3. Dependências do PETIC
+    # # ---------------------------------------------------------
 
-    weight_calculator = PeticWeightCalculator()
+    # path_finder = DijkstraPathFinder()
 
-    petic = PeticAllocator(
-        path_finder=path_finder,
-        weight_calculator=weight_calculator
-    )
+    # weight_calculator = PeticWeightCalculator()
+
+    # allocator = PeticAllocator(
+    #     path_finder=path_finder,
+    #     weight_calculator=weight_calculator
+    # )
 
     reservation_service = BandwidthReservationService()
-
+   
     # ---------------------------------------------------------
     # 4. Guarda o resultado do período anterior
     # ---------------------------------------------------------
@@ -71,7 +76,7 @@ def main():
 
     for demand in request.demands:
 
-        result = petic.allocate(
+        result = allocator.allocate(
             graph=graph,
             request=request,
             demand=demand,
