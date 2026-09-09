@@ -43,7 +43,7 @@ def main():
         demands=[
             SliceDemand(
                 id="t1",
-                bandwidth=80
+                bandwidth=20
             ),
             SliceDemand(
                 id="t2",
@@ -59,32 +59,33 @@ def main():
             )
         ]
     )
+    
     # ---------------------------------------------------------
     # 3. Dependências do ACO
     # ---------------------------------------------------------
-    allocator = AcoAllocator(
-        ants_count=10,
-        iterations=5,
-        alpha=0.5,
-        beta=0.5,
-        evaporation_rate=0.1,
-        initial_pheromone=1.0,
-        pheromone_deposit=1.0,
-        seed=42
-    )
+    # allocator = AcoAllocator(
+    #     ants_count=10,
+    #     iterations=5,
+    #     alpha=0.5,
+    #     beta=0.5,
+    #     evaporation_rate=0.1,
+    #     initial_pheromone=1.0,
+    #     pheromone_deposit=1.0,
+    #     seed=42
+    # )
 
     # # ---------------------------------------------------------
     # # 3. Dependências do PETIC
     # # ---------------------------------------------------------
 
-    # path_finder = DijkstraPathFinder()
+    path_finder = DijkstraPathFinder()
 
-    # weight_calculator = PeticWeightCalculator()
+    weight_calculator = PeticWeightCalculator()
 
-    # allocator = PeticAllocator(
-    #     path_finder=path_finder,
-    #     weight_calculator=weight_calculator
-    # )
+    allocator = PeticAllocator(
+        path_finder=path_finder,
+        weight_calculator=weight_calculator
+    )
 
     reservation_service = BandwidthReservationService()
    
