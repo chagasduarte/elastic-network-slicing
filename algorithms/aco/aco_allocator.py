@@ -88,12 +88,6 @@ class AcoAllocator(SliceAllocator):
                     demand=demand
                 )
                 
-                print(
-                    f"Formiga {ant_index} | "
-                    f"Caminho: {' -> '.join(path)} | "
-                    f"Custo: {cost:.4f}"
-                )
-
                 solutions.append(
                     (
                         path,
