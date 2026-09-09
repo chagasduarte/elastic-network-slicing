@@ -1,71 +1,6 @@
 from domain.network_graph import NetworkGraph
 from domain.link import Link
 from domain.node import Node
-from contracts.create_nodes import create_nodes
-
-def create_topo() -> NetworkGraph:
-    graph = NetworkGraph()
-
-    nodes = {
-        "A": Node("A"),
-        "B": Node("B"),
-        "C": Node("C"),
-        "D": Node("D"),
-        "E": Node("E"),
-        "F": Node("F"),
-        "G": Node("G"),
-        "H": Node("H"),
-    }
-    
-    graph.add_link(
-        Link(
-            source = nodes["A"],
-            target= nodes["B"],
-            capacity=100
-        )
-    )
-
-    graph.add_link(
-        Link(
-            source=nodes["B"],
-            target=nodes["D"],
-            capacity=100
-        )
-    )
-
-    graph.add_link(
-        Link(
-            source=nodes["D"],
-            target=nodes["E"],
-            capacity=100
-        )
-    )
-
-    graph.add_link(
-        Link(
-            source=nodes["A"],
-            target=nodes["C"],
-            capacity=50
-        )
-    )
-
-    graph.add_link(
-        Link(
-            source=nodes["C"],
-            target=nodes["E"],
-            capacity=50
-        )
-    )
-
-    graph.add_link(
-        Link(
-            source=nodes["C"],
-            target=nodes["G"],
-            capacity=100
-        )
-    )
-
-    return graph;
 
 def create_test_graph() -> NetworkGraph:
     graph = NetworkGraph()
@@ -121,6 +56,259 @@ def create_test_graph() -> NetworkGraph:
 
         Link(nodes["G"], nodes["J"], 220),
     ]
+
+    for link in links:
+        graph.add_link(link)
+
+    return graph
+
+NODE_LOCATIONS = {
+    "A": "UFC Campus do Pici / PoP-CE",
+    "B": "UECE Campus do Itaperi",
+    "C": "UFC Campus Porangabuçu",
+    "D": "FUNCAP",
+    "E": "UFC Reitoria",
+    "F": "UECE Centro de Humanidades",
+    "G": "Instituto Atlântico",
+    "H": "UFC Labomar",
+    "I": "Escola de Saúde Pública do Ceará",
+    "J": "Hospital Geral de Fortaleza",
+    "K": "UNIFOR",
+    "L": "SECITECE"
+}
+
+
+def create_test_graph_fortal() -> NetworkGraph:
+    graph = NetworkGraph()
+
+    nodes = {
+        name: Node(name)
+        for name in NODE_LOCATIONS.keys()
+    }
+
+    for node in nodes.values():
+        graph.add_node(node)
+
+    # ---------------------------------------------------------
+    # Enlaces
+    #
+    # IMPORTANTE:
+    # Os locais utilizados como nós são pontos reais.
+    # As conexões e capacidades abaixo fazem parte da
+    # topologia experimental do simulador.
+    # ---------------------------------------------------------
+
+    links = [
+
+        # =====================================================
+        # Rota 1
+        #
+        # UFC Pici
+        #   ↓
+        # UECE Itaperi
+        #   ↓
+        # SECITECE
+        # =====================================================
+
+        Link(
+            nodes["A"],
+            nodes["B"],
+            40
+        ),
+
+        Link(
+            nodes["B"],
+            nodes["L"],
+            40
+        ),
+
+        # =====================================================
+        # Rota 2
+        #
+        # UFC Pici
+        #   ↓
+        # UFC Porangabuçu
+        #   ↓
+        # FUNCAP
+        #   ↓
+        # SECITECE
+        # =====================================================
+
+        Link(
+            nodes["A"],
+            nodes["C"],
+            80
+        ),
+
+        Link(
+            nodes["C"],
+            nodes["D"],
+            80
+        ),
+
+        Link(
+            nodes["D"],
+            nodes["L"],
+            80
+        ),
+
+        # =====================================================
+        # Rota 3
+        #
+        # UFC Pici
+        #   ↓
+        # UFC Reitoria
+        #   ↓
+        # UECE Centro de Humanidades
+        #   ↓
+        # Instituto Atlântico
+        #   ↓
+        # SECITECE
+        # =====================================================
+
+        Link(
+            nodes["A"],
+            nodes["E"],
+            160
+        ),
+
+        Link(
+            nodes["E"],
+            nodes["F"],
+            160
+        ),
+
+        Link(
+            nodes["F"],
+            nodes["G"],
+            160
+        ),
+
+        Link(
+            nodes["G"],
+            nodes["L"],
+            160
+        ),
+
+        # =====================================================
+        # Rota 4
+        #
+        # UFC Pici
+        #   ↓
+        # UFC Labomar
+        #   ↓
+        # Escola de Saúde Pública
+        #   ↓
+        # Hospital Geral de Fortaleza
+        #   ↓
+        # UNIFOR
+        #   ↓
+        # SECITECE
+        # =====================================================
+
+        Link(
+            nodes["A"],
+            nodes["H"],
+            320
+        ),
+
+        Link(
+            nodes["H"],
+            nodes["I"],
+            320
+        ),
+
+        Link(
+            nodes["I"],
+            nodes["J"],
+            320
+        ),
+
+        Link(
+            nodes["J"],
+            nodes["K"],
+            320
+        ),
+
+        Link(
+            nodes["K"],
+            nodes["L"],
+            320
+        ),
+
+        # =====================================================
+        # Enlaces transversais
+        # =====================================================
+
+        # UECE Itaperi <-> UFC Porangabuçu
+        Link(
+            nodes["B"],
+            nodes["C"],
+            60
+        ),
+
+        # UECE Itaperi <-> UFC Reitoria
+        Link(
+            nodes["B"],
+            nodes["E"],
+            90
+        ),
+
+        # UFC Porangabuçu <-> UFC Reitoria
+        Link(
+            nodes["C"],
+            nodes["E"],
+            100
+        ),
+
+        # UFC Porangabuçu <-> UFC Labomar
+        Link(
+            nodes["C"],
+            nodes["H"],
+            120
+        ),
+
+        # FUNCAP <-> UECE Centro de Humanidades
+        Link(
+            nodes["D"],
+            nodes["F"],
+            110
+        ),
+
+        # FUNCAP <-> Instituto Atlântico
+        Link(
+            nodes["D"],
+            nodes["G"],
+            90
+        ),
+
+        # UFC Reitoria <-> UFC Labomar
+        Link(
+            nodes["E"],
+            nodes["H"],
+            180
+        ),
+
+        # UECE Centro de Humanidades
+        # <-> Escola de Saúde Pública
+        Link(
+            nodes["F"],
+            nodes["I"],
+            200
+        ),
+
+        # Instituto Atlântico
+        # <-> Hospital Geral de Fortaleza
+        Link(
+            nodes["G"],
+            nodes["J"],
+            220
+        )
+    ]
+
+    # ---------------------------------------------------------
+    # Adiciona os enlaces ao grafo
+    # ---------------------------------------------------------
 
     for link in links:
         graph.add_link(link)

@@ -6,8 +6,23 @@ from domain.slice_demand import SliceDemand
 from domain.slice_request import SliceRequest
 from pathfinding.dijkstra_path_finder import DijkstraPathFinder
 from services.bandwidth_reservation_service import BandwidthReservationService
-from contracts.create_topo import create_test_graph
+from contracts.create_topo import create_test_graph_fortal
 from domain.node import Node
+
+NODE_LOCATIONS = {
+    "A": "UFC Campus do Pici / PoP-CE",
+    "B": "UECE Campus do Itaperi",
+    "C": "UFC Campus Porangabuçu",
+    "D": "FUNCAP",
+    "E": "UFC Reitoria",
+    "F": "UECE Centro de Humanidades",
+    "G": "Instituto Atlântico",
+    "H": "UFC Labomar",
+    "I": "Escola de Saúde Pública do Ceará",
+    "J": "Hospital Geral de Fortaleza",
+    "K": "UNIFOR",
+    "L": "SECITECE"
+}
 
 
 def main():
@@ -15,7 +30,7 @@ def main():
     # 1. Criação da topologia
     # ---------------------------------------------------------
 
-    graph = create_test_graph()
+    graph = create_test_graph_fortal()
 
     # ---------------------------------------------------------
     # 2. Criação da requisição
@@ -47,7 +62,16 @@ def main():
     # ---------------------------------------------------------
     # 3. Dependências do ACO
     # ---------------------------------------------------------
-    allocator = AcoAllocator()
+    allocator = AcoAllocator(
+        ants_count=10,
+        iterations=5,
+        alpha=0.5,
+        beta=0.5,
+        evaporation_rate=0.1,
+        initial_pheromone=1.0,
+        pheromone_deposit=1.0,
+        seed=42
+    )
 
     # # ---------------------------------------------------------
     # # 3. Dependências do PETIC
@@ -82,17 +106,16 @@ def main():
             demand=demand,
             previous_result=previous_result
         )
-
+        
         # -----------------------------------------------------
         # 6. Exibe decisão do período
         # -----------------------------------------------------
 
-        print(f"Request: {result.request_id}")
-        print(f"Demanda: {result.demand_id}")
-        print(f"Bandwidth: {demand.bandwidth} Mbps")
 
         if result.accepted:
-
+            print(f"Request: {result.request_id}")
+            print(f"Demanda: {result.demand_id}")
+            print(f"Bandwidth: {demand.bandwidth} Mbps")
             print(
                 "Caminho:",
                 " -> ".join(result.path)

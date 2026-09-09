@@ -30,7 +30,7 @@ class NetworkGraph:
         self,
         node: Node
     ) -> list[tuple[Node, Link]]:
-        print("    ->buscando visinhos")
+
         neighbors = []
 
         for link in self._links:
@@ -39,7 +39,7 @@ class NetworkGraph:
 
             elif link.target == node:
                 neighbors.append((link.source, link))
-        print("    ->visinhos Encontrados: ", len(neighbors))
+
         return neighbors
 
     def get_links_from_path(
