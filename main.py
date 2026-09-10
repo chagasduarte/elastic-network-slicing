@@ -27,7 +27,7 @@ NODE_LOCATIONS = {
 
 def main():
     # ---------------------------------------------------------
-    # 1. Criação da topologia
+    # 1. Criação da topologias
     # ---------------------------------------------------------
 
     graph = create_test_graph_fortal()
