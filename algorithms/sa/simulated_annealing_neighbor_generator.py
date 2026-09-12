@@ -1,12 +1,10 @@
-# algorithms/sa/simulated_annealing_neighbor_generator.py
-
 import random
 
 from algorithms.sa.simulated_annealing_config import (
     SimulatedAnnealingConfig
 )
 from domain.network_graph import NetworkGraph
-from domain.node import Node
+from domain.slice_demand import SliceDemand
 
 
 class SimulatedAnnealingNeighborGenerator:
@@ -16,48 +14,55 @@ class SimulatedAnnealingNeighborGenerator:
         config: SimulatedAnnealingConfig,
         random_generator: random.Random
     ):
-        self.config = config
-        self.random = random_generator
+        self._config = config
+        self._random = random_generator
 
     def generate(
         self,
         graph: NetworkGraph,
-        current_path: list[Node],
-        source: Node,
-        destination: Node,
-        demand_id: str,
-        bandwidth: int
-    ) -> list[Node] | None:
+        current_path: list[str],
+        demand: SliceDemand
+    ) -> list[str] | None:
 
         if len(current_path) < 2:
             return None
 
         for _ in range(
-            self.config.neighbor_attempts
+            self._config.neighbor_attempts
         ):
 
-            pivot_index = self.random.randint(
-                0,
-                len(current_path) - 2
+            pivot_index = (
+                self._random.randint(
+                    0,
+                    len(current_path) - 2
+                )
             )
 
             prefix = current_path[
                 :pivot_index + 1
             ]
 
-            pivot = prefix[-1]
+            pivot_name = prefix[-1]
+
+            pivot_node = graph.get_node(
+                pivot_name
+            )
+
+            if pivot_node is None:
+                continue
+
+            destination = current_path[-1]
 
             visited = set(prefix)
 
-            suffix = self._find_random_suffix(
+            suffix = self._find_suffix(
                 graph=graph,
-                current=pivot,
-                destination=destination,
-                demand_id=demand_id,
-                bandwidth=bandwidth,
+                current_name=pivot_name,
+                destination_name=destination,
+                demand=demand,
                 visited=visited,
                 remaining_steps=(
-                    self.config.max_neighbor_steps
+                    self._config.max_neighbor_steps
                 )
             )
 
@@ -76,64 +81,68 @@ class SimulatedAnnealingNeighborGenerator:
 
         return None
 
-    def _find_random_suffix(
+    def _find_suffix(
         self,
         graph: NetworkGraph,
-        current: Node,
-        destination: Node,
-        demand_id: str,
-        bandwidth: int,
-        visited: set[Node],
+        current_name: str,
+        destination_name: str,
+        demand: SliceDemand,
+        visited: set[str],
         remaining_steps: int
-    ) -> list[Node] | None:
+    ) -> list[str] | None:
 
-        if current == destination:
-            return [current]
+        if (
+            current_name
+            == destination_name
+        ):
+            return [
+                current_name
+            ]
 
         if remaining_steps <= 0:
             return None
 
-        neighbors = graph.get_neighbors(
-            current
+        current_node = graph.get_node(
+            current_name
         )
 
-        candidates: list[Node] = []
+        if current_node is None:
+            return None
 
-        for neighbor in neighbors:
+        neighbors = list(
+            graph.get_neighbors(
+                current_node
+            )
+        )
 
-            if neighbor in visited:
-                continue
+        self._random.shuffle(
+            neighbors
+        )
 
-            link = graph.get_link(
-                current,
-                neighbor
+        for neighbor, link in neighbors:
+
+            neighbor_name = (
+                neighbor.name
             )
 
-            if link is None:
+            if neighbor_name in visited:
                 continue
 
             if not link.supports(
-                demand_id,
-                bandwidth
+                demand.id,
+                demand.bandwidth
             ):
                 continue
 
-            candidates.append(
-                neighbor
+            visited.add(
+                neighbor_name
             )
 
-        self.random.shuffle(candidates)
-
-        for neighbor in candidates:
-
-            visited.add(neighbor)
-
-            suffix = self._find_random_suffix(
+            suffix = self._find_suffix(
                 graph=graph,
-                current=neighbor,
-                destination=destination,
-                demand_id=demand_id,
-                bandwidth=bandwidth,
+                current_name=neighbor_name,
+                destination_name=destination_name,
+                demand=demand,
                 visited=visited,
                 remaining_steps=(
                     remaining_steps - 1
@@ -141,11 +150,14 @@ class SimulatedAnnealingNeighborGenerator:
             )
 
             if suffix is not None:
+
                 return [
-                    current,
+                    current_name,
                     *suffix
                 ]
 
-            visited.remove(neighbor)
+            visited.remove(
+                neighbor_name
+            )
 
         return None

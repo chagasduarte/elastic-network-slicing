@@ -1,10 +1,10 @@
-# algorithms/sa/simulated_annealing_cost_calculator.py
+import math
 
 from algorithms.sa.simulated_annealing_config import (
     SimulatedAnnealingConfig
 )
 from domain.network_graph import NetworkGraph
-from domain.node import Node
+from domain.slice_demand import SliceDemand
 
 
 class SimulatedAnnealingCostCalculator:
@@ -13,85 +13,22 @@ class SimulatedAnnealingCostCalculator:
         self,
         config: SimulatedAnnealingConfig
     ):
-        self.config = config
+        self._config = config
 
     def calculate(
         self,
         graph: NetworkGraph,
-        path: list[Node],
-        demand_id: str,
-        bandwidth: int,
-        previous_path: list[Node] | None = None
+        path: list[str],
+        demand: SliceDemand,
+        previous_path: list[str] | None = None
     ) -> float:
 
-        links = graph.get_links_from_path(path)
+        links = graph.get_links_from_path(
+            path
+        )
 
         if not links:
-            return 0.0
-
-        hop_cost = self._calculate_hop_cost(
-            graph,
-            links
-        )
-
-        utilizations = self._calculate_utilizations(
-            links,
-            demand_id,
-            bandwidth
-        )
-
-        if not utilizations:
-            return float("inf")
-
-        average_utilization = (
-            sum(utilizations) / len(utilizations)
-        )
-
-        bottleneck_utilization = max(utilizations)
-
-        path_change = self._calculate_path_change(
-            path,
-            previous_path
-        )
-
-        cost = (
-            self.config.hop_weight
-            * hop_cost
-
-            + self.config.avg_utilization_weight
-            * average_utilization
-
-            + self.config.bottleneck_weight
-            * bottleneck_utilization
-
-            + self.config.path_change_weight
-            * path_change
-        )
-
-        return cost
-
-    def _calculate_hop_cost(
-        self,
-        graph: NetworkGraph,
-        links
-    ) -> float:
-
-        maximum_possible_hops = max(
-            1,
-            graph.node_count - 1
-        )
-
-        return (
-            len(links)
-            / maximum_possible_hops
-        )
-
-    def _calculate_utilizations(
-        self,
-        links,
-        demand_id: str,
-        bandwidth: int
-    ) -> list[float]:
+            return math.inf
 
         utilizations: list[float] = []
 
@@ -99,33 +36,88 @@ class SimulatedAnnealingCostCalculator:
 
             allocated = (
                 link.allocated_bandwidth_at(
-                    demand_id
+                    demand.id
                 )
             )
 
             utilization = (
-                allocated + bandwidth
+                allocated
+                + demand.bandwidth
             ) / link.capacity
 
             if utilization > 1:
-                return []
+                return math.inf
 
             utilizations.append(
                 utilization
             )
 
-        return utilizations
+        hop_cost = self._hop_cost(
+            graph,
+            path
+        )
 
-    def _calculate_path_change(
+        average_utilization = (
+            sum(utilizations)
+            / len(utilizations)
+        )
+
+        bottleneck_utilization = max(
+            utilizations
+        )
+
+        path_change = self._path_change(
+            path,
+            previous_path
+        )
+
+        return (
+            self._config.hop_weight
+            * hop_cost
+
+            + self._config.avg_utilization_weight
+            * average_utilization
+
+            + self._config.bottleneck_weight
+            * bottleneck_utilization
+
+            + self._config.path_change_weight
+            * path_change
+        )
+
+    def _hop_cost(
         self,
-        path: list[Node],
-        previous_path: list[Node] | None
+        graph: NetworkGraph,
+        path: list[str]
+    ) -> float:
+
+        number_of_hops = (
+            len(path) - 1
+        )
+
+        maximum_possible_hops = max(
+            1,
+            len(graph.nodes) - 1
+        )
+
+        return (
+            number_of_hops
+            / maximum_possible_hops
+        )
+
+    def _path_change(
+        self,
+        current_path: list[str],
+        previous_path: list[str] | None
     ) -> float:
 
         if not previous_path:
             return 0.0
 
-        current_edges = self._edge_set(path)
+        current_edges = self._edge_set(
+            current_path
+        )
+
         previous_edges = self._edge_set(
             previous_path
         )
@@ -148,24 +140,34 @@ class SimulatedAnnealingCostCalculator:
             / len(union)
         )
 
-        return 1.0 - similarity
+        return (
+            1.0 - similarity
+        )
 
     def _edge_set(
         self,
-        path: list[Node]
+        path: list[str]
     ) -> set[tuple[str, str]]:
 
-        edges: set[tuple[str, str]] = set()
+        edges: set[
+            tuple[str, str]
+        ] = set()
 
         for index in range(
             len(path) - 1
         ):
-            source = path[index].id
-            target = path[index + 1].id
+
+            source = path[index]
+            destination = path[
+                index + 1
+            ]
 
             edge = tuple(
                 sorted(
-                    (source, target)
+                    (
+                        source,
+                        destination
+                    )
                 )
             )
 
