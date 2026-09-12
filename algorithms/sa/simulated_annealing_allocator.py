@@ -3,13 +3,13 @@
 import math
 import random
 
-from algorithms.simulated_annealing.simulated_annealing_config import (
+from algorithms.sa.simulated_annealing_config import (
     SimulatedAnnealingConfig
 )
-from algorithms.simulated_annealing.simulated_annealing_cost_calculator import (
+from algorithms.sa.simulated_annealing_cost_calculator import (
     SimulatedAnnealingCostCalculator
 )
-from algorithms.simulated_annealing.simulated_annealing_neighbor_generator import (
+from algorithms.sa.simulated_annealing_neighbor_generator import (
     SimulatedAnnealingNeighborGenerator
 )
 from contracts.path_finder import PathFinder
@@ -51,7 +51,9 @@ class SimulatedAnnealingAllocator(
     def allocate(
         self,
         graph: NetworkGraph,
-        request: SliceRequest
+        request: SliceRequest,
+        demand: SliceDemand,
+        previous_result: SliceResult | None = None
     ) -> list[SliceResult]:
 
         results: list[SliceResult] = []

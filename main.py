@@ -8,6 +8,20 @@ from pathfinding.dijkstra_path_finder import DijkstraPathFinder
 from services.bandwidth_reservation_service import BandwidthReservationService
 from contracts.create_topo import create_test_graph_fortal
 from domain.node import Node
+import random
+
+from algorithms.sa.simulated_annealing_allocator import (
+    SimulatedAnnealingAllocator
+)
+from algorithms.sa.simulated_annealing_config import (
+    SimulatedAnnealingConfig
+)
+from algorithms.sa.simulated_annealing_cost_calculator import (
+    SimulatedAnnealingCostCalculator
+)
+from algorithms.sa.simulated_annealing_neighbor_generator import (
+    SimulatedAnnealingNeighborGenerator
+)
 
 NODE_LOCATIONS = {
     "A": "UFC Campus do Pici / PoP-CE",
@@ -78,16 +92,47 @@ def main():
     # # 3. Dependências do PETIC
     # # ---------------------------------------------------------
 
+    # path_finder = DijkstraPathFinder()
+
+    #weight_calculator = PeticWeightCalculator()
+
+    #allocator = PeticAllocator(
+     #   path_finder=path_finder,
+      #  weight_calculator=weight_calculator
+    #)
+    # # ---------------------------------------------------------
+    # # 3. Dependências do SA
+    # # ---------------------------------------------------------
     path_finder = DijkstraPathFinder()
+    config = SimulatedAnnealingConfig()
+    reservation_service = BandwidthReservationService()
+    random_generator = random.Random(42)
 
-    weight_calculator = PeticWeightCalculator()
-
-    allocator = PeticAllocator(
-        path_finder=path_finder,
-        weight_calculator=weight_calculator
+    cost_calculator = (
+        SimulatedAnnealingCostCalculator(
+            config
+        )
     )
 
-    reservation_service = BandwidthReservationService()
+    neighbor_generator = (
+        SimulatedAnnealingNeighborGenerator(
+            config=config,
+            random_generator=random_generator
+        )
+    )
+
+    allocator = SimulatedAnnealingAllocator(
+        path_finder=path_finder,
+        cost_calculator=cost_calculator,
+        neighbor_generator=neighbor_generator,
+        reservation_service=reservation_service,
+        config=config,
+        random_generator=random_generator
+    )
+
+
+
+    
    
     # ---------------------------------------------------------
     # 4. Guarda o resultado do período anterior

@@ -1,6 +1,6 @@
-# algorithms/simulated_annealing/simulated_annealing_cost_calculator.py
+# algorithms/sa/simulated_annealing_cost_calculator.py
 
-from algorithms.simulated_annealing.simulated_annealing_config import (
+from algorithms.sa.simulated_annealing_config import (
     SimulatedAnnealingConfig
 )
 from domain.network_graph import NetworkGraph

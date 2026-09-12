@@ -1,8 +1,8 @@
-# algorithms/simulated_annealing/simulated_annealing_neighbor_generator.py
+# algorithms/sa/simulated_annealing_neighbor_generator.py
 
 import random
 
-from algorithms.simulated_annealing.simulated_annealing_config import (
+from algorithms.sa.simulated_annealing_config import (
     SimulatedAnnealingConfig
 )
 from domain.network_graph import NetworkGraph
