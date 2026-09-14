@@ -8,6 +8,7 @@ from pathfinding.dijkstra_path_finder import DijkstraPathFinder
 from services.bandwidth_reservation_service import BandwidthReservationService
 from contracts.create_topo import create_test_graph_fortal
 from domain.node import Node
+from contracts.geant_topology import create_geant_graph
 import random
 
 from algorithms.sa.simulated_annealing_allocator import (
@@ -44,7 +45,7 @@ def main():
     # 1. Criação da topologias
     # ---------------------------------------------------------
 
-    graph = create_test_graph_fortal()
+    graph = create_geant_graph()
 
     # ---------------------------------------------------------
     # 2. Criação da requisição

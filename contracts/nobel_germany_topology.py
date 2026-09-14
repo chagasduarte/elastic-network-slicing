@@ -1,6 +1,9 @@
 """
 Topologia para o simulador do TCC.
 
+Os nós foram padronizados como A, B, C... para manter compatibilidade
+com a main.py e com as demais topologias do projeto.
+
 Estrutura esperada pelo projeto:
     from domain.network_graph import NetworkGraph
     from domain.link import Link
@@ -17,43 +20,64 @@ from domain.node import Node
 
 
 NODE_LOCATIONS = {
-    "Hannover": "Hannover, Alemanha",
-    "Frankfurt": "Frankfurt, Alemanha",
-    "Hamburg": "Hamburgo, Alemanha",
-    "Norden": "Norden, Alemanha",
-    "Bremen": "Bremen, Alemanha",
-    "Berlin": "Berlim, Alemanha",
-    "Muenchen": "Munique, Alemanha",
-    "Ulm": "Ulm, Alemanha",
-    "Nuernberg": "Nuremberg, Alemanha",
-    "Stuttgart": "Stuttgart, Alemanha",
-    "Karlsruhe": "Karlsruhe, Alemanha",
-    "Mannheim": "Mannheim, Alemanha",
-    "Essen": "Essen, Alemanha",
-    "Dortmund": "Dortmund, Alemanha",
-    "Duesseldorf": "Düsseldorf, Alemanha",
-    "Koeln": "Colônia, Alemanha",
-    "Leipzig": "Leipzig, Alemanha",
+    "A": "Hannover, Alemanha",
+    "B": "Frankfurt, Alemanha",
+    "C": "Hamburgo, Alemanha",
+    "D": "Norden, Alemanha",
+    "E": "Bremen, Alemanha",
+    "F": "Berlim, Alemanha",
+    "G": "Munique, Alemanha",
+    "H": "Ulm, Alemanha",
+    "I": "Nuremberg, Alemanha",
+    "J": "Stuttgart, Alemanha",
+    "K": "Karlsruhe, Alemanha",
+    "L": "Mannheim, Alemanha",
+    "M": "Essen, Alemanha",
+    "N": "Dortmund, Alemanha",
+    "O": "Düsseldorf, Alemanha",
+    "P": "Colônia, Alemanha",
+    "Q": "Leipzig, Alemanha",
 }
 
+ORIGINAL_NODE_NAMES = {
+    "A": "Hannover",
+    "B": "Frankfurt",
+    "C": "Hamburg",
+    "D": "Norden",
+    "E": "Bremen",
+    "F": "Berlin",
+    "G": "Muenchen",
+    "H": "Ulm",
+    "I": "Nuernberg",
+    "J": "Stuttgart",
+    "K": "Karlsruhe",
+    "L": "Mannheim",
+    "M": "Essen",
+    "N": "Dortmund",
+    "O": "Duesseldorf",
+    "P": "Koeln",
+    "Q": "Leipzig",
+}
+
+
 NODE_COORDINATES = {
-    "Hannover": (9.80, 52.39),
-    "Frankfurt": (8.66, 50.14),
-    "Hamburg": (10.08, 53.55),
-    "Norden": (7.21, 53.60),
-    "Bremen": (8.80, 53.08),
-    "Berlin": (13.48, 52.52),
-    "Muenchen": (11.55, 48.15),
-    "Ulm": (9.99, 48.40),
-    "Nuernberg": (11.08, 49.45),
-    "Stuttgart": (9.12, 48.73),
-    "Karlsruhe": (8.41, 49.01),
-    "Mannheim": (8.49, 49.49),
-    "Essen": (7.00, 51.44),
-    "Dortmund": (7.48, 51.51),
-    "Duesseldorf": (6.78, 51.22),
-    "Koeln": (7.01, 50.92),
-    "Leipzig": (12.38, 51.34),
+    "A": (9.80, 52.39),
+    "B": (8.66, 50.14),
+    "C": (10.08, 53.55),
+    "D": (7.21, 53.60),
+    "E": (8.80, 53.08),
+    "F": (13.48, 52.52),
+    "G": (11.55, 48.15),
+    "H": (9.99, 48.40),
+    "I": (11.08, 49.45),
+    "J": (9.12, 48.73),
+    "K": (8.41, 49.01),
+    "L": (8.49, 49.49),
+    "M": (7.00, 51.44),
+    "N": (7.48, 51.51),
+    "O": (6.78, 51.22),
+    "P": (7.01, 50.92),
+    "Q": (12.38, 51.34),
 }
 
 DEFAULT_LINK_CAPACITY_MBPS = 800
@@ -84,41 +108,41 @@ def create_nobel_germany_graph(
         graph.add_node(node)
 
     links = [
-        Link(nodes["Berlin"], nodes["Hamburg"], link_capacity),
-        Link(nodes["Berlin"], nodes["Hannover"], link_capacity),
-        Link(nodes["Berlin"], nodes["Leipzig"], link_capacity),
+        Link(nodes["F"], nodes["C"], link_capacity),
+        Link(nodes["F"], nodes["A"], link_capacity),
+        Link(nodes["F"], nodes["Q"], link_capacity),
 
-        Link(nodes["Bremen"], nodes["Hamburg"], link_capacity),
-        Link(nodes["Bremen"], nodes["Hannover"], link_capacity),
-        Link(nodes["Bremen"], nodes["Norden"], link_capacity),
+        Link(nodes["E"], nodes["C"], link_capacity),
+        Link(nodes["E"], nodes["A"], link_capacity),
+        Link(nodes["E"], nodes["D"], link_capacity),
 
-        Link(nodes["Dortmund"], nodes["Essen"], link_capacity),
-        Link(nodes["Dortmund"], nodes["Hannover"], link_capacity),
-        Link(nodes["Dortmund"], nodes["Koeln"], link_capacity),
-        Link(nodes["Dortmund"], nodes["Norden"], link_capacity),
+        Link(nodes["N"], nodes["M"], link_capacity),
+        Link(nodes["N"], nodes["A"], link_capacity),
+        Link(nodes["N"], nodes["P"], link_capacity),
+        Link(nodes["N"], nodes["D"], link_capacity),
 
-        Link(nodes["Duesseldorf"], nodes["Essen"], link_capacity),
-        Link(nodes["Duesseldorf"], nodes["Koeln"], link_capacity),
+        Link(nodes["O"], nodes["M"], link_capacity),
+        Link(nodes["O"], nodes["P"], link_capacity),
 
-        Link(nodes["Frankfurt"], nodes["Hannover"], link_capacity),
-        Link(nodes["Frankfurt"], nodes["Koeln"], link_capacity),
-        Link(nodes["Frankfurt"], nodes["Leipzig"], link_capacity),
-        Link(nodes["Frankfurt"], nodes["Mannheim"], link_capacity),
-        Link(nodes["Frankfurt"], nodes["Nuernberg"], link_capacity),
+        Link(nodes["B"], nodes["A"], link_capacity),
+        Link(nodes["B"], nodes["P"], link_capacity),
+        Link(nodes["B"], nodes["Q"], link_capacity),
+        Link(nodes["B"], nodes["L"], link_capacity),
+        Link(nodes["B"], nodes["I"], link_capacity),
 
-        Link(nodes["Hamburg"], nodes["Hannover"], link_capacity),
-        Link(nodes["Hannover"], nodes["Leipzig"], link_capacity),
+        Link(nodes["C"], nodes["A"], link_capacity),
+        Link(nodes["A"], nodes["Q"], link_capacity),
 
-        Link(nodes["Karlsruhe"], nodes["Mannheim"], link_capacity),
-        Link(nodes["Karlsruhe"], nodes["Stuttgart"], link_capacity),
+        Link(nodes["K"], nodes["L"], link_capacity),
+        Link(nodes["K"], nodes["J"], link_capacity),
 
-        Link(nodes["Leipzig"], nodes["Nuernberg"], link_capacity),
+        Link(nodes["Q"], nodes["I"], link_capacity),
 
-        Link(nodes["Muenchen"], nodes["Nuernberg"], link_capacity),
-        Link(nodes["Muenchen"], nodes["Ulm"], link_capacity),
+        Link(nodes["G"], nodes["I"], link_capacity),
+        Link(nodes["G"], nodes["H"], link_capacity),
 
-        Link(nodes["Nuernberg"], nodes["Stuttgart"], link_capacity),
-        Link(nodes["Stuttgart"], nodes["Ulm"], link_capacity),
+        Link(nodes["I"], nodes["J"], link_capacity),
+        Link(nodes["J"], nodes["H"], link_capacity),
     ]
 
     for link in links:

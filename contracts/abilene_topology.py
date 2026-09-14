@@ -1,6 +1,9 @@
 """
 Topologia para o simulador do TCC.
 
+Os nós foram padronizados como A, B, C... para manter compatibilidade
+com a main.py e com as demais topologias do projeto.
+
 Estrutura esperada pelo projeto:
     from domain.network_graph import NetworkGraph
     from domain.link import Link
@@ -17,33 +20,49 @@ from domain.node import Node
 
 
 NODE_LOCATIONS = {
-    "ATLAM5": "Atlanta, Georgia, EUA",
-    "ATLAng": "Atlanta, Georgia, EUA",
-    "CHINng": "Chicago, Illinois, EUA",
-    "DNVRng": "Denver, Colorado, EUA",
-    "HSTNng": "Houston, Texas, EUA",
-    "IPLSng": "Indianapolis, Indiana, EUA",
-    "KSCYng": "Kansas City, EUA",
-    "LOSAng": "Los Angeles, California, EUA",
-    "NYCMng": "Nova York, New York, EUA",
-    "SNVAng": "Sunnyvale, California, EUA",
-    "STTLng": "Seattle, Washington, EUA",
-    "WASHng": "Washington, DC, EUA",
+    "A": "Atlanta, Georgia, EUA",
+    "B": "Atlanta, Georgia, EUA",
+    "C": "Chicago, Illinois, EUA",
+    "D": "Denver, Colorado, EUA",
+    "E": "Houston, Texas, EUA",
+    "F": "Indianapolis, Indiana, EUA",
+    "G": "Kansas City, EUA",
+    "H": "Los Angeles, California, EUA",
+    "I": "Nova York, New York, EUA",
+    "J": "Sunnyvale, California, EUA",
+    "K": "Seattle, Washington, EUA",
+    "L": "Washington, DC, EUA",
 }
 
+ORIGINAL_NODE_NAMES = {
+    "A": "ATLAM5",
+    "B": "ATLAng",
+    "C": "CHINng",
+    "D": "DNVRng",
+    "E": "HSTNng",
+    "F": "IPLSng",
+    "G": "KSCYng",
+    "H": "LOSAng",
+    "I": "NYCMng",
+    "J": "SNVAng",
+    "K": "STTLng",
+    "L": "WASHng",
+}
+
+
 NODE_COORDINATES = {
-    "ATLAM5": (-84.3833, 33.75),
-    "ATLAng": (-85.50, 34.50),
-    "CHINng": (-87.6167, 41.8333),
-    "DNVRng": (-105.00, 40.75),
-    "HSTNng": (-95.517364, 29.770031),
-    "IPLSng": (-86.159535, 39.780622),
-    "KSCYng": (-96.596704, 38.961694),
-    "LOSAng": (-118.25, 34.05),
-    "NYCMng": (-73.9667, 40.7833),
-    "SNVAng": (-122.02553, 37.38575),
-    "STTLng": (-122.30, 47.60),
-    "WASHng": (-77.026842, 38.897303),
+    "A": (-84.3833, 33.75),
+    "B": (-85.50, 34.50),
+    "C": (-87.6167, 41.8333),
+    "D": (-105.00, 40.75),
+    "E": (-95.517364, 29.770031),
+    "F": (-86.159535, 39.780622),
+    "G": (-96.596704, 38.961694),
+    "H": (-118.25, 34.05),
+    "I": (-73.9667, 40.7833),
+    "J": (-122.02553, 37.38575),
+    "K": (-122.30, 47.60),
+    "L": (-77.026842, 38.897303),
 }
 
 
@@ -74,21 +93,21 @@ def create_abilene_graph(capacity_scale: float = 1.0) -> NetworkGraph:
         return max(1, int(round(value * capacity_scale)))
 
     links = [
-        Link(nodes["ATLAng"], nodes["ATLAM5"], cap(9920)),
-        Link(nodes["HSTNng"], nodes["ATLAng"], cap(9920)),
-        Link(nodes["IPLSng"], nodes["ATLAng"], cap(2480)),
-        Link(nodes["WASHng"], nodes["ATLAng"], cap(9920)),
-        Link(nodes["IPLSng"], nodes["CHINng"], cap(9920)),
-        Link(nodes["NYCMng"], nodes["CHINng"], cap(9920)),
-        Link(nodes["KSCYng"], nodes["DNVRng"], cap(9920)),
-        Link(nodes["SNVAng"], nodes["DNVRng"], cap(9920)),
-        Link(nodes["STTLng"], nodes["DNVRng"], cap(9920)),
-        Link(nodes["KSCYng"], nodes["HSTNng"], cap(9920)),
-        Link(nodes["LOSAng"], nodes["HSTNng"], cap(9920)),
-        Link(nodes["KSCYng"], nodes["IPLSng"], cap(9920)),
-        Link(nodes["SNVAng"], nodes["LOSAng"], cap(9920)),
-        Link(nodes["WASHng"], nodes["NYCMng"], cap(9920)),
-        Link(nodes["STTLng"], nodes["SNVAng"], cap(9920)),
+        Link(nodes["B"], nodes["A"], cap(9920)),
+        Link(nodes["E"], nodes["B"], cap(9920)),
+        Link(nodes["F"], nodes["B"], cap(2480)),
+        Link(nodes["L"], nodes["B"], cap(9920)),
+        Link(nodes["F"], nodes["C"], cap(9920)),
+        Link(nodes["I"], nodes["C"], cap(9920)),
+        Link(nodes["G"], nodes["D"], cap(9920)),
+        Link(nodes["J"], nodes["D"], cap(9920)),
+        Link(nodes["K"], nodes["D"], cap(9920)),
+        Link(nodes["G"], nodes["E"], cap(9920)),
+        Link(nodes["H"], nodes["E"], cap(9920)),
+        Link(nodes["G"], nodes["F"], cap(9920)),
+        Link(nodes["J"], nodes["H"], cap(9920)),
+        Link(nodes["L"], nodes["I"], cap(9920)),
+        Link(nodes["K"], nodes["J"], cap(9920)),
     ]
 
     for link in links:

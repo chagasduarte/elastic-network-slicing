@@ -1,6 +1,9 @@
 """
 Topologia para o simulador do TCC.
 
+Os nós foram padronizados como A, B, C... para manter compatibilidade
+com a main.py e com as demais topologias do projeto.
+
 Estrutura esperada pelo projeto:
     from domain.network_graph import NetworkGraph
     from domain.link import Link
@@ -17,53 +20,79 @@ from domain.node import Node
 
 
 NODE_LOCATIONS = {
-    "at1.at": "Viena, Áustria",
-    "be1.be": "Bruxelas, Bélgica",
-    "ch1.ch": "Genebra, Suíça",
-    "cz1.cz": "Praga, República Tcheca",
-    "de1.de": "Frankfurt, Alemanha",
-    "es1.es": "Madri, Espanha",
-    "fr1.fr": "Paris, França",
-    "gr1.gr": "Atenas, Grécia",
-    "hr1.hr": "Zagreb, Croácia",
-    "hu1.hu": "Budapeste, Hungria",
-    "ie1.ie": "Dublin, Irlanda",
-    "il1.il": "Tel Aviv, Israel",
-    "it1.it": "Milão, Itália",
-    "lu1.lu": "Luxemburgo",
-    "nl1.nl": "Amsterdã, Países Baixos",
-    "ny1.ny": "Nova York, EUA",
-    "pl1.pl": "Poznań, Polônia",
-    "pt1.pt": "Lisboa, Portugal",
-    "se1.se": "Estocolmo, Suécia",
-    "si1.si": "Liubliana, Eslovênia",
-    "sk1.sk": "Bratislava, Eslováquia",
-    "uk1.uk": "Londres, Reino Unido",
+    "A": "Viena, Áustria",
+    "B": "Bruxelas, Bélgica",
+    "C": "Genebra, Suíça",
+    "D": "Praga, República Tcheca",
+    "E": "Frankfurt, Alemanha",
+    "F": "Madri, Espanha",
+    "G": "Paris, França",
+    "H": "Atenas, Grécia",
+    "I": "Zagreb, Croácia",
+    "J": "Budapeste, Hungria",
+    "K": "Dublin, Irlanda",
+    "L": "Tel Aviv, Israel",
+    "M": "Milão, Itália",
+    "N": "Luxemburgo",
+    "O": "Amsterdã, Países Baixos",
+    "P": "Nova York, EUA",
+    "Q": "Poznań, Polônia",
+    "R": "Lisboa, Portugal",
+    "S": "Estocolmo, Suécia",
+    "T": "Liubliana, Eslovênia",
+    "U": "Bratislava, Eslováquia",
+    "V": "Londres, Reino Unido",
 }
 
+ORIGINAL_NODE_NAMES = {
+    "A": "at1.at",
+    "B": "be1.be",
+    "C": "ch1.ch",
+    "D": "cz1.cz",
+    "E": "de1.de",
+    "F": "es1.es",
+    "G": "fr1.fr",
+    "H": "gr1.gr",
+    "I": "hr1.hr",
+    "J": "hu1.hu",
+    "K": "ie1.ie",
+    "L": "il1.il",
+    "M": "it1.it",
+    "N": "lu1.lu",
+    "O": "nl1.nl",
+    "P": "ny1.ny",
+    "Q": "pl1.pl",
+    "R": "pt1.pt",
+    "S": "se1.se",
+    "T": "si1.si",
+    "U": "sk1.sk",
+    "V": "uk1.uk",
+}
+
+
 NODE_COORDINATES = {
-    "at1.at": (16.3729, 48.2091),
-    "be1.be": (4.3518, 50.8469),
-    "ch1.ch": (6.1399, 46.2038),
-    "cz1.cz": (14.4423, 50.0785),
-    "de1.de": (8.6842, 50.1122),
-    "es1.es": (-3.7033, 40.4167),
-    "fr1.fr": (2.351, 48.8566),
-    "gr1.gr": (23.5808, 37.9778),
-    "hr1.hr": (15.9644, 45.8071),
-    "hu1.hu": (19.0936, 47.4976),
-    "ie1.ie": (-6.2573, 53.3416),
-    "il1.il": (34.8097, 32.0714),
-    "it1.it": (9.19, 45.4642),
-    "lu1.lu": (6.1296, 49.6112),
-    "nl1.nl": (4.9407, 52.3236),
-    "ny1.ny": (-73.94384, 40.6698),
-    "pl1.pl": (16.8874, 52.3963),
-    "pt1.pt": (-9.1363, 38.7073),
-    "se1.se": (17.8742, 59.3617),
-    "si1.si": (14.5148, 46.0574),
-    "sk1.sk": (17.1297, 48.1531),
-    "uk1.uk": (-0.1264, 51.5086),
+    "A": (16.3729, 48.2091),
+    "B": (4.3518, 50.8469),
+    "C": (6.1399, 46.2038),
+    "D": (14.4423, 50.0785),
+    "E": (8.6842, 50.1122),
+    "F": (-3.7033, 40.4167),
+    "G": (2.351, 48.8566),
+    "H": (23.5808, 37.9778),
+    "I": (15.9644, 45.8071),
+    "J": (19.0936, 47.4976),
+    "K": (-6.2573, 53.3416),
+    "L": (34.8097, 32.0714),
+    "M": (9.19, 45.4642),
+    "N": (6.1296, 49.6112),
+    "O": (4.9407, 52.3236),
+    "P": (-73.94384, 40.6698),
+    "Q": (16.8874, 52.3963),
+    "R": (-9.1363, 38.7073),
+    "S": (17.8742, 59.3617),
+    "T": (14.5148, 46.0574),
+    "U": (17.1297, 48.1531),
+    "V": (-0.1264, 51.5086),
 }
 
 # A instância da SNDlib lista capacidade pré-instalada 0 e um módulo
@@ -91,58 +120,58 @@ def create_geant_graph(
         graph.add_node(node)
 
     links = [
-        Link(nodes["at1.at"], nodes["ch1.ch"], link_capacity),
-        Link(nodes["at1.at"], nodes["de1.de"], link_capacity),
-        Link(nodes["at1.at"], nodes["hu1.hu"], link_capacity),
-        Link(nodes["at1.at"], nodes["ny1.ny"], link_capacity),
-        Link(nodes["at1.at"], nodes["si1.si"], link_capacity),
+        Link(nodes["A"], nodes["C"], link_capacity),
+        Link(nodes["A"], nodes["E"], link_capacity),
+        Link(nodes["A"], nodes["J"], link_capacity),
+        Link(nodes["A"], nodes["P"], link_capacity),
+        Link(nodes["A"], nodes["T"], link_capacity),
 
-        Link(nodes["be1.be"], nodes["fr1.fr"], link_capacity),
-        Link(nodes["be1.be"], nodes["lu1.lu"], link_capacity),
-        Link(nodes["be1.be"], nodes["nl1.nl"], link_capacity),
+        Link(nodes["B"], nodes["G"], link_capacity),
+        Link(nodes["B"], nodes["N"], link_capacity),
+        Link(nodes["B"], nodes["O"], link_capacity),
 
-        Link(nodes["ch1.ch"], nodes["fr1.fr"], link_capacity),
-        Link(nodes["ch1.ch"], nodes["it1.it"], link_capacity),
+        Link(nodes["C"], nodes["G"], link_capacity),
+        Link(nodes["C"], nodes["M"], link_capacity),
 
-        Link(nodes["cz1.cz"], nodes["de1.de"], link_capacity),
-        Link(nodes["cz1.cz"], nodes["pl1.pl"], link_capacity),
-        Link(nodes["cz1.cz"], nodes["sk1.sk"], link_capacity),
+        Link(nodes["D"], nodes["E"], link_capacity),
+        Link(nodes["D"], nodes["Q"], link_capacity),
+        Link(nodes["D"], nodes["U"], link_capacity),
 
-        Link(nodes["de1.de"], nodes["fr1.fr"], link_capacity),
-        Link(nodes["de1.de"], nodes["gr1.gr"], link_capacity),
-        Link(nodes["de1.de"], nodes["ie1.ie"], link_capacity),
-        Link(nodes["de1.de"], nodes["it1.it"], link_capacity),
-        Link(nodes["de1.de"], nodes["nl1.nl"], link_capacity),
-        Link(nodes["de1.de"], nodes["se1.se"], link_capacity),
+        Link(nodes["E"], nodes["G"], link_capacity),
+        Link(nodes["E"], nodes["H"], link_capacity),
+        Link(nodes["E"], nodes["K"], link_capacity),
+        Link(nodes["E"], nodes["M"], link_capacity),
+        Link(nodes["E"], nodes["O"], link_capacity),
+        Link(nodes["E"], nodes["S"], link_capacity),
 
-        Link(nodes["es1.es"], nodes["fr1.fr"], link_capacity),
-        Link(nodes["es1.es"], nodes["it1.it"], link_capacity),
-        Link(nodes["es1.es"], nodes["pt1.pt"], link_capacity),
+        Link(nodes["F"], nodes["G"], link_capacity),
+        Link(nodes["F"], nodes["M"], link_capacity),
+        Link(nodes["F"], nodes["R"], link_capacity),
 
-        Link(nodes["fr1.fr"], nodes["lu1.lu"], link_capacity),
-        Link(nodes["fr1.fr"], nodes["uk1.uk"], link_capacity),
+        Link(nodes["G"], nodes["N"], link_capacity),
+        Link(nodes["G"], nodes["V"], link_capacity),
 
-        Link(nodes["gr1.gr"], nodes["it1.it"], link_capacity),
+        Link(nodes["H"], nodes["M"], link_capacity),
 
-        Link(nodes["hr1.hr"], nodes["hu1.hu"], link_capacity),
-        Link(nodes["hr1.hr"], nodes["si1.si"], link_capacity),
+        Link(nodes["I"], nodes["J"], link_capacity),
+        Link(nodes["I"], nodes["T"], link_capacity),
 
-        Link(nodes["hu1.hu"], nodes["sk1.sk"], link_capacity),
+        Link(nodes["J"], nodes["U"], link_capacity),
 
-        Link(nodes["ie1.ie"], nodes["uk1.uk"], link_capacity),
+        Link(nodes["K"], nodes["V"], link_capacity),
 
-        Link(nodes["il1.il"], nodes["it1.it"], link_capacity),
-        Link(nodes["il1.il"], nodes["nl1.nl"], link_capacity),
+        Link(nodes["L"], nodes["M"], link_capacity),
+        Link(nodes["L"], nodes["O"], link_capacity),
 
-        Link(nodes["nl1.nl"], nodes["uk1.uk"], link_capacity),
+        Link(nodes["O"], nodes["V"], link_capacity),
 
-        Link(nodes["ny1.ny"], nodes["uk1.uk"], link_capacity),
+        Link(nodes["P"], nodes["V"], link_capacity),
 
-        Link(nodes["pl1.pl"], nodes["se1.se"], link_capacity),
+        Link(nodes["Q"], nodes["S"], link_capacity),
 
-        Link(nodes["pt1.pt"], nodes["uk1.uk"], link_capacity),
+        Link(nodes["R"], nodes["V"], link_capacity),
 
-        Link(nodes["se1.se"], nodes["uk1.uk"], link_capacity),
+        Link(nodes["S"], nodes["V"], link_capacity),
     ]
 
     for link in links:
