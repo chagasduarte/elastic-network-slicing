@@ -41,7 +41,7 @@ class PeticAllocator(SliceAllocator):
             and previous_result.accepted
             and previous_result.bandwidth >= demand.bandwidth
         )
-
+        
         def cost_function(link: Link) -> float:
 
             if not link.supports(demand.id, demand.bandwidth):

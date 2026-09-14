@@ -92,43 +92,42 @@ def main():
     # # 3. Dependências do PETIC
     # # ---------------------------------------------------------
 
-    # path_finder = DijkstraPathFinder()
+    path_finder = DijkstraPathFinder()
 
-    #weight_calculator = PeticWeightCalculator()
+    weight_calculator = PeticWeightCalculator()
 
-    #allocator = PeticAllocator(
-     #   path_finder=path_finder,
-      #  weight_calculator=weight_calculator
-    #)
+    allocator = PeticAllocator(
+       path_finder=path_finder,
+       weight_calculator=weight_calculator
+    )
     # # ---------------------------------------------------------
     # # 3. Dependências do SA
     # # ---------------------------------------------------------
-    path_finder = DijkstraPathFinder()
-    config = SimulatedAnnealingConfig()
-    reservation_service = BandwidthReservationService()
-    random_generator = random.Random(42)
+    # path_finder = DijkstraPathFinder()
+    # config = SimulatedAnnealingConfig()
+    # random_generator = random.Random(42)
 
-    cost_calculator = (
-        SimulatedAnnealingCostCalculator(
-            config
-        )
-    )
+    # cost_calculator = (
+    #     SimulatedAnnealingCostCalculator(
+    #         config
+    #     )
+    # )
 
-    neighbor_generator = (
-        SimulatedAnnealingNeighborGenerator(
-            config=config,
-            random_generator=random_generator
-        )
-    )
+    # neighbor_generator = (
+    #     SimulatedAnnealingNeighborGenerator(
+    #         config=config,
+    #         random_generator=random_generator
+    #     )
+    # )
 
-    allocator = SimulatedAnnealingAllocator(
-        path_finder=path_finder,
-        cost_calculator=cost_calculator,
-        neighbor_generator=neighbor_generator,
-        reservation_service=reservation_service,
-        config=config,
-        random_generator=random_generator
-    )
+    # allocator = SimulatedAnnealingAllocator(
+    #     path_finder=path_finder,
+    #     cost_calculator=cost_calculator,
+    #     neighbor_generator=neighbor_generator,
+    #     reservation_service=reservation_service,
+    #     config=config,
+    #     random_generator=random_generator
+    # )
 
 
 
@@ -137,6 +136,7 @@ def main():
     # ---------------------------------------------------------
     # 4. Guarda o resultado do período anterior
     # ---------------------------------------------------------
+    reservation_service = BandwidthReservationService()
 
     previous_result = None
 

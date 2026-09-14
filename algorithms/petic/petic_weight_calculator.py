@@ -19,7 +19,8 @@ class PeticWeightCalculator(LinkWeightCalculator):
 
         if available < demand.bandwidth:
             return math.inf
-
+        
+        # podemos mudar o cálculo depois para deixae mais equilibrado, mas por enquanto vamos deixar assim
         return math.exp(
             demand.bandwidth / available
         )
