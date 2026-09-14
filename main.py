@@ -57,7 +57,7 @@ def main():
         demands=[
             SliceDemand(
                 id="t1",
-                bandwidth=20
+                bandwidth=40
             ),
             SliceDemand(
                 id="t2",
@@ -69,7 +69,7 @@ def main():
             ),
             SliceDemand(
                 id="t4",
-                bandwidth=105
+                bandwidth=320
             )
         ]
     )

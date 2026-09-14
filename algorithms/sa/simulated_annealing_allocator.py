@@ -147,21 +147,6 @@ class SimulatedAnnealingAllocator(SliceAllocator):
 
             iteration += 1
 
-        links = graph.get_links_from_path(
-            best_path
-        )
-
-        allocation = LinkAllocation(
-            request_id=request.id,
-            demand_id=demand.id,
-            bandwidth=demand.bandwidth
-        )
-
-        self._reservation_service.reserve(
-            links,
-            allocation
-        )
-
         return SliceResult(
             request_id=request.id,
             demand_id=demand.id,
