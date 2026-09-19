@@ -1,6 +1,6 @@
 # Elastic Network Slicing
 
-Simulador em Python para estudar a alocação de fatias de rede com demandas de largura de banda que variam ao longo de períodos. Desenvolvido no contexto de um TCC, o projeto reúne implementações de PETIC, Ant Colony Optimization (ACO) e Simulated Annealing (SA) sobre topologias representadas por grafos.
+Simulador em Python para estudar a alocação de fatias de rede com demandas de largura de banda que variam ao longo de períodos. Desenvolvido no contexto de um TCC, o projeto reúne implementações de PETIC, Ant Colony Optimization (ACO), Simulated Annealing (SA) e Q-learning sobre topologias representadas por grafos.
 
 Cada requisição conecta uma origem a um destino e define a banda necessária em cada período. O simulador busca um caminho com capacidade disponível, registra a reserva nos enlaces e passa o resultado ao próximo período, permitindo que o algoritmo considere a alocação anterior.
 
@@ -14,6 +14,18 @@ Na raiz do repositório, execute:
 ```bash
 python3 main.py
 ```
+
+Para selecionar outro algoritmo e definir a semente:
+
+```bash
+python3 main.py --algorithm petic
+python3 main.py --algorithm aco --seed 42
+python3 main.py --algorithm sa --seed 42
+python3 main.py --algorithm q-learning --seed 42
+python3 main.py --help
+```
+
+O padrão continua sendo PETIC; a semente padrão é `42`. A semente controla os geradores locais de ACO, SA e Q-learning e não altera o PETIC, que é determinístico.
 
 Opcionalmente, crie um ambiente virtual antes de executar:
 
@@ -76,7 +88,7 @@ A ocupação é calculada por `demand_id`: reservas de `t1` não consomem a capa
 
 ## Configuração dos experimentos
 
-A topologia, a requisição e o algoritmo são configurados diretamente em [main.py](main.py).
+A topologia e a requisição são configuradas em [main.py](main.py). O algoritmo é selecionado por `--algorithm`; os parâmetros específicos de cada alocador podem ser alterados na função `create_allocator`.
 
 ### Alterar origem, destino e demandas
 
@@ -124,17 +136,18 @@ Os comentários desses módulos descrevem a conectividade como transcrita de ins
 
 ### Escolher um algoritmo
 
-Mantenha apenas um bloco de criação de `allocator` ativo em `main.py`. Os imports usados nos exemplos abaixo já estão presentes nesse arquivo.
+Use a opção `--algorithm` ou chame `main(algorithm="q-learning", seed=42)` em Python. A chamada `main()` mantém a execução padrão. A função `create_allocator` centraliza a construção dos quatro alocadores; os exemplos abaixo mostram como personalizar seus parâmetros.
 
 | Algoritmo | Comportamento implementado | Uso do período anterior |
 | --- | --- | --- |
 | PETIC | Usa Dijkstra com custo exponencial da razão entre banda solicitada e banda disponível. Descarta enlaces sem capacidade. | Favorece enlaces do caminho anterior quando a demanda atual não supera a banda anteriormente aceita. |
 | ACO | Constrói caminhos probabilísticos com feromônios e uma heurística de disponibilidade de banda, aplicando evaporação e reforço a cada iteração. | Recebe `previous_result`, mas não o utiliza; os feromônios são reiniciados a cada alocação. |
 | SA | Parte de um caminho viável obtido por Dijkstra e explora caminhos vizinhos com resfriamento e aceitação probabilística de soluções de maior custo. | Inclui no custo a diferença entre os enlaces do caminho atual e do anterior. |
+| Q-learning | Aprende valores de ações entre nós com exploração epsilon-greedy e recompensa negativa do custo dos enlaces viáveis. Retorna o melhor caminho completo encontrado, comparando os episódios com a política gulosa. | Penaliza enlaces novos em relação ao caminho anterior aceito da mesma requisição e dos mesmos extremos. A tabela Q é reiniciada a cada alocação. |
 
 #### PETIC
 
-Esta é a configuração já ativa:
+Configuração usada por `--algorithm petic`:
 
 ```python
 path_finder = DijkstraPathFinder()
@@ -150,7 +163,7 @@ O peso normal de um enlace é `exp(banda_solicitada / banda_disponivel)`. Quando
 
 #### Ant Colony Optimization (ACO)
 
-Substitua o bloco de construção do PETIC por:
+Configuração usada por `--algorithm aco` com a semente padrão:
 
 ```python
 allocator = AcoAllocator(
@@ -169,7 +182,7 @@ allocator = AcoAllocator(
 
 #### Simulated Annealing (SA)
 
-Substitua o bloco de construção do PETIC pelo exemplo abaixo. Mova a inicialização de `reservation_service` para este ponto e remova sua inicialização posterior em `main.py`, mantendo a chamada de reserva dentro do laço de demandas.
+Configuração usada por `--algorithm sa`. O serviço de reserva é criado antes do alocador e a reserva continua sendo feita no laço de demandas:
 
 ```python
 reservation_service = BandwidthReservationService()
@@ -191,7 +204,69 @@ allocator = SimulatedAnnealingAllocator(
 
 [SimulatedAnnealingConfig](algorithms/sa/simulated_annealing_config.py) define temperatura inicial `0.25`, temperatura mínima `0.001`, fator de resfriamento `0.95` e limite de 500 iterações. O custo combina quantidade normalizada de saltos, utilização média, utilização do enlace mais ocupado e mudança de caminho, com pesos `0.20`, `0.30`, `0.35` e `0.15`, respectivamente. As utilizações são projetadas considerando a inclusão da demanda atual. Ao alterar os pesos, a soma deve continuar igual a `1.0`.
 
-O bloco de SA originalmente comentado em `main.py` usa `reservation_service` antes de sua criação; por isso, ativá-lo exige o ajuste de ordem mostrado acima. Há também uma limitação no tratamento de demandas inviáveis, descrita abaixo.
+Há uma limitação existente no tratamento de demandas inviáveis do SA, descrita abaixo.
+
+#### Q-learning
+
+O Q-learning recebe exatamente o contrato dos demais alocadores:
+
+```python
+result = allocator.allocate(
+    graph=graph,
+    request=request,
+    demand=demand,
+    previous_result=previous_result,
+)
+```
+
+`graph` fornece nós, enlaces e capacidade disponível no período; `request` fornece os identificadores, a origem e o destino; `demand` fornece o período e a banda exigida. `previous_result` é opcional e permite favorecer a continuidade do caminho. O retorno é o mesmo `SliceResult` usado pelos outros algoritmos. O treinamento não reserva banda nem altera o grafo.
+
+Configuração usada por `--algorithm q-learning`:
+
+```python
+allocator = QLearningAllocator(
+    config=QLearningConfig(
+        episodes=2000,
+        learning_rate=0.2,
+        discount_factor=1.0,
+        epsilon_start=1.0,
+        epsilon_min=0.05,
+        epsilon_decay=0.995,
+        max_steps_per_episode=None,
+        path_change_penalty=0.15,
+    ),
+    seed=42,
+)
+```
+
+| Parâmetro | Padrão | Função |
+| --- | ---: | --- |
+| `episodes` | `2000` | Quantidade de episódios de treinamento por demanda. |
+| `learning_rate` | `0.2` | Taxa de atualização dos valores Q (`alpha`). |
+| `discount_factor` | `1.0` | Peso do custo futuro (`gamma`), entre `0.0` e `1.0`; com `1.0`, considera a soma dos custos do caminho. |
+| `epsilon_start` | `1.0` | Probabilidade inicial de explorar uma ação aleatória. |
+| `epsilon_min` | `0.05` | Limite inferior da probabilidade de exploração. |
+| `epsilon_decay` | `0.995` | Fator multiplicativo de redução de epsilon a cada episódio. |
+| `max_steps_per_episode` | `None` | Limita a duração do episódio; `None` usa quatro vezes o número de nós. |
+| `path_change_penalty` | `0.15` | Custo adicional por enlace ausente do caminho anterior aplicável; use `0.0` para desativá-lo. |
+
+O **estado** é o nó atual e cada **ação** escolhe um vizinho ligado por um enlace com capacidade suficiente para a demanda no período. Cada episódio começa na origem e termina ao chegar ao destino ou atingir o limite de passos. Revisitas a nós são permitidas durante o aprendizado, mantendo as ações dependentes apenas do nó no cenário fixo daquela alocação.
+
+O custo de uma ação é `exp(banda_solicitada / banda_disponivel)` mais a penalidade de mudança, quando aplicável. A parte exponencial segue o custo usado por PETIC e ACO; a penalidade favorece continuidade, inspirada no SA. Ela é aditiva por enlace novo, **não corresponde à distância de Jaccard** entre caminhos usada no SA. Só há essa penalidade quando o resultado anterior foi aceito, pertence à mesma requisição e tem os mesmos extremos.
+
+A recompensa é o negativo desse custo. A atualização segue:
+
+```text
+Q(s, a) <- Q(s, a) + alpha * (r + gamma * max Q(s', a') - Q(s, a))
+```
+
+No destino, o valor futuro é zero. O limite de passos é um truncamento do treinamento: atingir esse limite não transforma o nó atual em destino, e a última atualização preserva a estimativa do valor futuro.
+
+A tabela Q é reiniciada em cada `allocate`, pois o período, a ocupação, a banda solicitada e o caminho anterior podem mudar. Ao final, o alocador compara o melhor caminho sem ciclos extraído dos episódios que chegaram ao destino com o caminho da política gulosa, e retorna o de menor custo. Essa comparação usa o mesmo `gamma` do treinamento: soma `gamma ** passo * custo_do_enlace`, com o primeiro passo em zero. Com `gamma=1.0` e penalidade de mudança igual a zero, o objetivo corresponde à soma dos custos exponenciais usada pelo ACO e pelo PETIC quando o favorecimento do caminho anterior não se aplica.
+
+Se não encontrar caminho completo, o Q-learning rejeita a demanda. Não há busca auxiliar por Dijkstra: com um orçamento finito de exploração, o algoritmo pode rejeitar uma demanda viável e não garante o caminho ótimo.
+
+A formulação e suas escolhas estão detalhadas em [Q-learning para alocação de fatias](algorithms/q_learning/README.md). A regra de atualização tem como referência [Watkins e Dayan (1992), *Q-learning*](https://doi.org/10.1007/BF00992698); os parâmetros e o orçamento de treinamento deste simulador não constituem uma garantia de convergência.
 
 ## Estrutura do projeto
 
@@ -201,21 +276,33 @@ elastic-network-slicing/
 ├── algorithms/
 │   ├── petic/                  # Alocador PETIC e cálculo de pesos
 │   ├── aco/                    # Alocador por colônia de formigas
-│   └── sa/                     # Alocador, custo, vizinhança e configuração do SA
+│   ├── sa/                     # Alocador, custo, vizinhança e configuração do SA
+│   └── q_learning/             # Alocador, configuração e formulação do Q-learning
 ├── contracts/                  # Interfaces abstratas e construção de topologias
 ├── domain/                     # Nós, enlaces, requisições, demandas e resultados
 ├── pathfinding/                # Implementação de Dijkstra
 ├── services/                   # Validação e reserva de largura de banda
+├── tests/                      # Testes automatizados do Q-learning e integração
 └── metrics/                    # Arquivos reservados para futuras métricas
 ```
 
 A interface [SliceAllocator](contracts/slice_allocator.py) define o método `allocate(graph, request, demand, previous_result=None)`. Novos alocadores podem implementar esse contrato e ser instanciados em `main.py`, preservando o fluxo de reserva por período.
 
+## Testes
+
+Execute a suíte com a biblioteca padrão:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+Os testes verificam o contrato do Q-learning, capacidade por período, rejeições, influência do resultado anterior e reprodução com semente fixa. Para executar os quatro algoritmos no mesmo cenário, use os comandos da seção de execução; cada processo cria um grafo novo.
+
 ## Estado atual e limitações
 
 - O programa executa uma requisição com vários períodos. Experimentos com várias requisições exigem adaptar o fluxo de `main.py` e compartilhar o grafo entre elas.
 - Os arquivos `allocation_success_rate.py`, `computational_cost.py` e `link_saturation.py`, em `metrics/`, estão vazios. Essas métricas ainda não são calculadas nem exportadas.
-- Não há suíte de testes automatizados no repositório. A execução padrão foi verificada com Python 3.14.7, com aceitação dos quatro períodos.
+- O Q-learning treina novamente a cada demanda; não há persistência da tabela Q nem aprendizado entre execuções. Os algoritmos usam objetivos distintos, por isso comparar apenas a aceitação não mede qualidade de caminho ou custo de busca.
 - No SA, a rejeição por ausência de caminho viável chama `SliceResult` com `period_id`, mas o modelo espera `demand_id`. Esse caso gera `TypeError` e precisa ser corrigido antes de usar o SA em experimentos com rejeições.
 
 Para comparar algoritmos, recrie o grafo a cada execução independente, use as mesmas demandas e capacidades e registre os parâmetros e sementes utilizados.

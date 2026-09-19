@@ -13,10 +13,10 @@ class AcoAllocator(SliceAllocator):
 
     def __init__(
         self,
-        ants_count: int = 20,
-        iterations: int = 50,
+        ants_count: int = 10,
+        iterations: int = 20,
         alpha: float = 1.0,
-        beta: float = 2.0,
+        beta: float = 1.0,
         evaporation_rate: float = 0.1,
         initial_pheromone: float = 1.0,
         pheromone_deposit: float = 1.0,

@@ -217,7 +217,7 @@ class SimulatedAnnealingAllocator(SliceAllocator):
 
         return SliceResult(
             request_id=request.id,
-            period_id=demand.id,
+            demand_id=demand.id,
             accepted=False,
             path=[],
             bandwidth=demand.bandwidth
