@@ -1,0 +1,16 @@
+{
+  "topologies": ["nobel-germany"],
+  "link_capacity": 800,
+  "seed": 42,
+  "repetitions": 2,
+  "algorithms": ["petic", "aco", "sa", "q-learning"],
+  "base_bandwidth": 40,
+  "noise": 0.3,
+  "profile": {"t1": 0.25, "t2": 0.5, "t3": 0.75, "t4": 1.0},
+  "load_levels": [
+    {"name": "leve", "requests": 10, "multiplier": 1.0},
+    {"name": "media", "requests": 40, "multiplier": 2.0},
+    {"name": "alta", "requests": 80, "multiplier": 3.0}
+  ],
+  "parameters": {"q-learning": {"episodes": 200}}
+}
