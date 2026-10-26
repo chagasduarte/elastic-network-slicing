@@ -283,7 +283,8 @@ elastic-network-slicing/
 ├── pathfinding/                # Implementação de Dijkstra
 ├── services/                   # Validação e reserva de largura de banda
 ├── tests/                      # Testes automatizados do Q-learning e integração
-└── metrics/                    # Arquivos reservados para futuras métricas
+├── experiments/                # Runner, CLI, gerador de cenários e configs JSON
+└── metrics/                    # Coleta, cálculo, agregação, intervalos e exportação
 ```
 
 A interface [SliceAllocator](contracts/slice_allocator.py) define o método `allocate(graph, request, demand, previous_result=None)`. Novos alocadores podem implementar esse contrato e ser instanciados em `main.py`, preservando o fluxo de reserva por período.
@@ -298,10 +299,20 @@ python3 -m unittest discover -s tests -v
 
 Os testes verificam o contrato do Q-learning, capacidade por período, rejeições, influência do resultado anterior e reprodução com semente fixa. Para executar os quatro algoritmos no mesmo cenário, use os comandos da seção de execução; cada processo cria um grafo novo.
 
+## Métricas e estatística
+
+`metrics/` calcula, por execução e por período: aceitação, banda atendida, utilização média e máxima, enlaces saturados, índice de Jain, saltos, reutilização de caminho e tempo de decisão.
+
+- **Saturação:** enlaces (e pares enlace-período) com utilização ≥ 80%, ≥ 90% e = 100% (`saturated_links_80`, `saturated_links_90`, `saturated_links`).
+- **Jain:** `fairness_jain` mistura todos os pares enlace-período; `fairness_jain_period_mean` é a média dos índices calculados em cada período.
+- **Entre repetições** (`metrics/aggregation.py`): média, mediana, mínimo, máximo, desvio-padrão **amostral** (n − 1) e intervalo de confiança de 95% pela t de Student (`ci95_low`, `ci95_high`), calculados em `metrics/intervals.py` só com a biblioteca padrão. Com uma única repetição, desvio e intervalo são `None`.
+- Desvios dentro de uma execução (tempos das decisões, utilização dos enlaces) continuam populacionais, pois descrevem todas as observações daquela execução.
+
+Dependências de desenvolvimento (`requirements-dev.txt`): `scipy`, usado apenas para conferir a tabela de quantis t nos testes.
+
 ## Estado atual e limitações
 
 - O programa executa uma requisição com vários períodos. Experimentos com várias requisições exigem adaptar o fluxo de `main.py` e compartilhar o grafo entre elas.
-- Os arquivos `allocation_success_rate.py`, `computational_cost.py` e `link_saturation.py`, em `metrics/`, estão vazios. Essas métricas ainda não são calculadas nem exportadas.
 - O Q-learning treina novamente a cada demanda; não há persistência da tabela Q nem aprendizado entre execuções. Os algoritmos usam objetivos distintos, por isso comparar apenas a aceitação não mede qualidade de caminho ou custo de busca.
 - No SA, a rejeição por ausência de caminho viável chama `SliceResult` com `period_id`, mas o modelo espera `demand_id`. Esse caso gera `TypeError` e precisa ser corrigido antes de usar o SA em experimentos com rejeições.
 

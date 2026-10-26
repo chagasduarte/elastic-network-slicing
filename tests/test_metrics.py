@@ -271,6 +271,39 @@ class MetricsTests(unittest.TestCase):
         self.assertAlmostEqual(network.fairness_jain, 25 / 27)
         self.assertAlmostEqual(network.utilization_stddev, math.sqrt(1 / 18))
 
+    def test_saturation_thresholds_80_90_and_100(self):
+        graph = make_graph([("A", "B", 100), ("B", "C", 100), ("C", "D", 100),
+                            ("D", "E", 100)])
+        collector = MetricsCollector(["t1"])
+        for index, (path, bandwidth) in enumerate(
+            ((("A", "B"), 79), (("B", "C"), 80), (("C", "D"), 90), (("D", "E"), 100))
+        ):
+            self.record(collector, graph, bandwidth=bandwidth, path=path,
+                        request_id=f"r{index}", source=path[0], destination=path[1])
+        collector.snapshot_period(graph, "t1")
+        network = self.calculate(collector).summary.network
+        self.assertEqual(network.saturated_links_80, 3)
+        self.assertEqual(network.saturated_links_90, 2)
+        self.assertEqual(network.saturated_links, 1)
+        self.assertEqual(network.saturated_link_periods_80, 3)
+        self.assertEqual(network.saturated_link_periods_90, 2)
+
+    def test_jain_is_computed_per_period_and_averaged(self):
+        graph = make_graph([("A", "B", 100), ("B", "C", 100)])
+        collector = MetricsCollector(["t1", "t2"])
+        # t1: um enlace a 100%, outro ocioso -> Jain 1/2. t2: ambos a 50% -> Jain 1.
+        self.record(collector, graph, period="t1", bandwidth=100)
+        collector.snapshot_period(graph, "t1")
+        self.record(collector, graph, period="t2", bandwidth=50)
+        self.record(collector, graph, period="t2", bandwidth=50, path=("B", "C"),
+                    request_id="request-2", source="B", destination="C")
+        collector.snapshot_period(graph, "t2")
+        result = self.calculate(collector)
+        first, second = (item.metrics.network for item in result.periods)
+        self.assertAlmostEqual(first.fairness_jain, 0.5)
+        self.assertAlmostEqual(second.fairness_jain, 1.0)
+        self.assertAlmostEqual(result.summary.network.fairness_jain_period_mean, 0.75)
+
     def test_reuse_change_rejection_gap_and_request_identity(self):
         graph = make_graph([("A", "B", 100), ("B", "C", 100),
                             ("A", "C", 100)])

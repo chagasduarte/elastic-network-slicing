@@ -24,7 +24,8 @@ def make_run(run_id="1", seed=42, accepted=True, elapsed=1.0):
         acceptance=AcceptanceMetrics(1, int(accepted), int(not accepted), float(accepted), 100.0 * accepted),
         bandwidth=BandwidthMetrics(40.0, allocated, 40.0 - allocated, float(accepted), 100.0 * accepted),
         network=NetworkMetrics(100.0, 100.0, allocated, 100.0 - allocated, 1, 1,
-                               allocated, allocated, allocated, 0, 0, float(accepted), 0.0),
+                               allocated, allocated, allocated, 0, 0, 0, 0, 0, 0,
+                               float(accepted), float(accepted), 0.0),
         paths=PathMetrics(int(accepted), float(accepted), int(accepted), int(accepted), int(accepted)),
         timing=TimingMetrics(elapsed, elapsed, elapsed, elapsed, 0.0),
         path_changes=PathChangeMetrics(0, 0, 0, 0.0, 0.0),
@@ -86,7 +87,7 @@ class MetricsExporterTests(unittest.TestCase):
         self.assertEqual(json.loads(rows[0]["run_ids"]), ["1", "2"])
         self.assertEqual(json.loads(rows[0]["seeds"]), [42, 43])
         self.assertEqual(float(rows[0]["acceptance.acceptance_percent.mean"]), 50.0)
-        self.assertEqual(float(rows[0]["timing.total_seconds.stddev"]), 1.0)
+        self.assertAlmostEqual(float(rows[0]["timing.total_seconds.stddev"]), 2 ** 0.5)
         self.assertEqual(rows[0]["counters.iterations.mean"], "")
         self.assertEqual(rows[0]["counters.iterations.count"], "0")
 
@@ -109,14 +110,19 @@ class MetricsExporterTests(unittest.TestCase):
 
 
 class MetricsAggregationTests(unittest.TestCase):
-    def test_numeric_statistics_use_population_deviation_and_record_seeds(self):
+    def test_numeric_statistics_use_sample_deviation_and_record_seeds(self):
         aggregates = aggregate_runs([make_run(), make_run("2", 43, False, 3.0)])
         summary, period = aggregates
-        expected = {"count": 2, "mean": 50.0, "median": 50.0, "min": 0.0, "max": 100.0, "stddev": 50.0}
-        self.assertEqual(summary["metrics"]["acceptance.acceptance_percent"], expected)
-        self.assertEqual(summary["metrics"]["timing.total_seconds"], {
-            "count": 2, "mean": 2.0, "median": 2.0, "min": 1.0, "max": 3.0, "stddev": 1.0,
-        })
+        expected = summary["metrics"]["acceptance.acceptance_percent"]
+        # [100, 0]: s = 100/sqrt(2); IC = 50 ± 12,706 * s / sqrt(2) = 50 ± 635,3.
+        for name, value in {
+            "count": 2, "mean": 50.0, "median": 50.0, "min": 0.0, "max": 100.0,
+            "stddev": 100 / 2 ** 0.5, "ci95_low": 50 - 635.3, "ci95_high": 50 + 635.3,
+        }.items():
+            self.assertAlmostEqual(expected[name], value, places=6)
+        timing = summary["metrics"]["timing.total_seconds"]
+        self.assertAlmostEqual(timing["stddev"], 2 ** 0.5)
+        self.assertAlmostEqual(timing["ci95_high"] - timing["mean"], 12.706)
         self.assertEqual(summary["run_ids"], ["1", "2"])
         self.assertEqual(summary["seeds"], [42, 43])
         self.assertIsNone(summary["period"])
@@ -126,9 +132,12 @@ class MetricsAggregationTests(unittest.TestCase):
     def test_unavailable_counters_remain_unavailable(self):
         group = aggregate_runs([make_run()])[0]
         self.assertEqual(group["metrics"]["counters.iterations"], {
-            "count": 0, "mean": None, "median": None, "min": None, "max": None, "stddev": None,
+            "count": 0, "mean": None, "median": None, "min": None, "max": None,
+            "stddev": None, "ci95_low": None, "ci95_high": None,
         })
-        self.assertEqual(group["metrics"]["acceptance.accepted"]["stddev"], 0.0)
+        # Com uma única repetição o desvio amostral é indefinido, não zero.
+        self.assertIsNone(group["metrics"]["acceptance.accepted"]["stddev"])
+        self.assertIsNone(group["metrics"]["acceptance.accepted"]["ci95_low"])
 
     def test_optional_counters_count_only_available_observations(self):
         first = make_run()

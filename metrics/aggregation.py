@@ -3,9 +3,10 @@
 from collections import defaultdict
 from dataclasses import asdict
 import json
-from statistics import mean, median, pstdev
+from statistics import mean, median
 from typing import Any, Iterable
 
+from metrics.intervals import confidence_interval_95, sample_stddev
 from metrics.models import ExperimentMetrics
 
 
@@ -25,7 +26,9 @@ def aggregate_runs(runs: Iterable[ExperimentMetrics]) -> list[dict[str, Any]]:
     """Agrupa por algoritmo, topologia, cenário, parâmetros e período.
 
     ``period=None`` representa o resumo geral. ``stddev`` é o desvio-padrão
-    populacional. Valores indisponíveis não são convertidos em zero nem usados
+    amostral (n - 1) e ``ci95_low``/``ci95_high`` o intervalo de confiança de
+    95% da média (t de Student); ambos são None com menos de 2 observações.
+    Valores indisponíveis não são convertidos em zero nem usados
     como observações: cada métrica informa seu próprio ``count``.
     """
     groups = {}
@@ -67,12 +70,15 @@ def aggregate_runs(runs: Iterable[ExperimentMetrics]) -> list[dict[str, Any]]:
                 if isinstance(sample.get(name), (int, float))
                 and not isinstance(sample[name], bool)
             ]
+            interval = confidence_interval_95(values)
             group["metrics"][name] = {
                 "count": len(values),
                 "mean": mean(values) if values else None,
                 "median": median(values) if values else None,
                 "min": min(values) if values else None,
                 "max": max(values) if values else None,
-                "stddev": pstdev(values) if values else None,
+                "stddev": sample_stddev(values),
+                "ci95_low": interval[0] if interval else None,
+                "ci95_high": interval[1] if interval else None,
             }
     return list(groups.values())

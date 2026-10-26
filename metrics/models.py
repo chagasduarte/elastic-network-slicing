@@ -91,7 +91,15 @@ class NetworkMetrics:
     max_utilization_percent: float
     saturated_links: int
     saturated_link_periods: int
+    # Enlaces (e pares enlace-período) com utilização >= 80% e >= 90%.
+    saturated_links_80: int
+    saturated_link_periods_80: int
+    saturated_links_90: int
+    saturated_link_periods_90: int
+    # Jain sobre todos os pares enlace-período misturados.
     fairness_jain: float
+    # Média dos índices de Jain calculados em cada período (recomendado).
+    fairness_jain_period_mean: float
     utilization_stddev: float
 
 

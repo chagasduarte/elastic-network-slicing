@@ -1,0 +1,18 @@
+{
+  "topologies": ["abilene", "nobel-germany", "geant", "germany50"],
+  "link_capacity": 800,
+  "seed": 42,
+  "repetitions": 10,
+  "algorithms": ["petic", "aco", "sa", "q-learning"],
+  "base_bandwidth": 40,
+  "noise": 0.3,
+  "profile": {"t1": 0.25, "t2": 0.5, "t3": 0.75, "t4": 1.0},
+  "load_levels": [
+    {"name": "l1", "requests": 10, "multiplier": 1.0},
+    {"name": "l2", "requests": 20, "multiplier": 1.5},
+    {"name": "l3", "requests": 40, "multiplier": 2.0},
+    {"name": "l4", "requests": 60, "multiplier": 2.5},
+    {"name": "l5", "requests": 80, "multiplier": 3.0},
+    {"name": "l6", "requests": 80, "multiplier": 4.0}
+  ]
+}

@@ -89,6 +89,15 @@ class MetricsExporter:
         return target
 
     @staticmethod
+    def _with_interval(stats: dict[str, Any], spec: str) -> str:
+        if stats["stddev"] is None:
+            return f"{stats['mean']:{spec}} (n=1, sem desvio)"
+        return (
+            f"{stats['mean']:{spec}} ± {stats['stddev']:{spec}} "
+            f"[{stats['ci95_low']:{spec}}; {stats['ci95_high']:{spec}}]"
+        )
+
+    @staticmethod
     def format_terminal(
         runs: Iterable[ExperimentMetrics],
         aggregates: list[dict[str, Any]] | None = None,
@@ -110,14 +119,14 @@ class MetricsExporter:
                     f"({metrics.acceptance.acceptance_percent:.2f}%) | "
                     f"banda {metrics.bandwidth.allocated:g}/{metrics.bandwidth.requested:g} Mbps | "
                     f"utilização média {metrics.network.average_utilization_percent:.2f}% | "
-                    f"Jain {metrics.network.fairness_jain:.4f} | "
+                    f"Jain {metrics.network.fairness_jain_period_mean:.4f} | "
                     f"saltos {metrics.paths.mean_hops:.2f} | "
                     f"tempo {metrics.timing.total_seconds:.6f} s"
                 )
         if not found:
             lines.append("Nenhuma execução.")
         if aggregates:
-            lines.append("Agregação das repetições (média ± desvio-padrão populacional):")
+            lines.append("Agregação das repetições (média ± desvio-padrão amostral [IC 95%]):")
             for aggregate in aggregates:
                 if aggregate["period"] is not None:
                     continue
@@ -126,7 +135,7 @@ class MetricsExporter:
                 lines.append(
                     f"  {aggregate['algorithm']} | {aggregate['topology']} "
                     f"| cenário={aggregate['scenario_id']} | n={aggregate['run_count']}: "
-                    f"aceitação {acceptance['mean']:.2f} ± {acceptance['stddev']:.2f}% | "
-                    f"tempo {timing['mean']:.6f} ± {timing['stddev']:.6f} s"
+                    f"aceitação {MetricsExporter._with_interval(acceptance, '.2f')}% | "
+                    f"tempo {MetricsExporter._with_interval(timing, '.6f')} s"
                 )
         return "\n".join(lines)

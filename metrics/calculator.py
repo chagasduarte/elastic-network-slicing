@@ -1,4 +1,9 @@
-"""Fórmulas puras sobre medições, com desvio-padrão populacional."""
+"""Fórmulas puras sobre medições.
+
+Os desvios internos de uma execução (tempos das decisões e utilização dos
+enlaces) são populacionais: descrevem todas as observações daquela execução.
+O desvio entre repetições é amostral e fica em ``metrics.aggregation``.
+"""
 
 from copy import deepcopy
 from statistics import fmean, pstdev
@@ -31,6 +36,10 @@ def _mean(values: list[float]) -> float:
 
 def _stddev(values: list[float]) -> float:
     return pstdev(values) if values else 0.0
+
+
+def _jain(values: list[float]) -> float:
+    return _ratio(sum(values) ** 2, len(values) * sum(value ** 2 for value in values))
 
 
 class MetricsCalculator:
@@ -120,11 +129,12 @@ class MetricsCalculator:
         capacity = sum(link.capacity for link in links)
         used = sum(link.used_bandwidth for link in links)
         saturated = [link for link in links if link.used_bandwidth >= link.capacity]
+        # Comparação inteira (used * 100 >= limiar * capacidade) evita erro de float.
+        above_80 = [link for link in links if link.used_bandwidth * 100 >= 80 * link.capacity]
+        above_90 = [link for link in links if link.used_bandwidth * 100 >= 90 * link.capacity]
         # Todos os enlaces entram, inclusive ociosos; nenhuma carga => Jain 0.
-        fairness = _ratio(
-            sum(utilizations) ** 2,
-            len(utilizations) * sum(value ** 2 for value in utilizations),
-        )
+        fairness = _jain(utilizations)
+        period_jain = [_jain([link.utilization for link in item.links]) for item in snapshots]
         return NetworkMetrics(
             physical_capacity=sum(physical.values()),
             total_capacity=capacity,
@@ -137,7 +147,12 @@ class MetricsCalculator:
             max_utilization_percent=100 * max(utilizations, default=0.0),
             saturated_links=len({(link.source, link.target) for link in saturated}),
             saturated_link_periods=len(saturated),
+            saturated_links_80=len({(link.source, link.target) for link in above_80}),
+            saturated_link_periods_80=len(above_80),
+            saturated_links_90=len({(link.source, link.target) for link in above_90}),
+            saturated_link_periods_90=len(above_90),
             fairness_jain=fairness,
+            fairness_jain_period_mean=_mean(period_jain),
             utilization_stddev=_stddev(utilizations),
         )
 
