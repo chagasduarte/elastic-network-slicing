@@ -8,9 +8,9 @@ import math
 class SimulatedAnnealingConfig:
     initial_temperature: float = 0.25
     minimum_temperature: float = 0.001
-    cooling_rate: float = 0.95
+    cooling_rate: float = 0.9728
 
-    max_iterations: int = 500
+    max_iterations: int = 200
 
     neighbor_attempts: int = 30
     max_neighbor_steps: int = 20
