@@ -289,6 +289,17 @@ elastic-network-slicing/
 
 A interface [SliceAllocator](contracts/slice_allocator.py) define o método `allocate(graph, request, demand, previous_result=None)`. Novos alocadores podem implementar esse contrato e ser instanciados em `main.py`, preservando o fluxo de reserva por período.
 
+## Execução completa (matriz de experimentos)
+
+```bash
+python3.11 -m experiments.run_all --config experiments/configs/default.json --dry-run   # lista sem rodar
+python3.11 -m experiments.run_all --config experiments/configs/default.json            # grava em results/<AAAAMMDD-HHMMSS>/
+python3.11 -m experiments.run_all --resume                                              # retoma a execução mais recente
+python3.11 -m experiments.run_all --estimar                                             # roda versão reduzida e extrapola o tempo
+```
+
+Sobrescritas: `--topologies`, `--algorithms`, `--repetitions`, `--seed`, `--output-root`. A execução é sequencial (o tempo de decisão é métrica). Cada célula (topologia, nível) é gravada atomicamente em `<topologia>/<nível>/` (`runs.json`, `runs.csv`, `aggregates.csv`, `celula.json`); na raiz ficam `config_usada.json`, `metadados.json` (commit, árvore suja, Python, data/hora), `todas_execucoes.csv` e `todos_agregados.csv` (com `topology`, `load_level`, `requests`, `multiplier`).
+
 ## Testes
 
 Execute a suíte com a biblioteca padrão:
