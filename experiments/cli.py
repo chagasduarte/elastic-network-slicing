@@ -58,6 +58,28 @@ def create_algorithm_specs(names=ALGORITHMS, parameter_overrides=None):
     return specs
 
 
+def executar_celula(topology, level, config, specs, *, repetitions, seed):
+    """Roda uma célula (topologia, nível de carga) com todos os algoritmos.
+
+    Compartilhada por `--config` e por `experiments.run_all`; devolve
+    (execuções, agregados).
+    """
+    def factory():
+        return uniform_capacity(TOPOLOGIES[topology](), config.link_capacity)
+
+    requests = generate_requests(
+        factory(), level, config.profile,
+        base_bandwidth=config.base_bandwidth,
+        noise=config.noise, seed=seed,
+    )
+    runs = ExperimentRunner().run(
+        factory, requests, specs, topology=topology,
+        repetitions=repetitions, seed=seed,
+        period_order=tuple(config.profile.factors),
+    )
+    return runs, aggregate_runs(runs)
+
+
 def _run_config(parser, args) -> None:
     try:
         config = load_config(args.config)
@@ -74,21 +96,11 @@ def _run_config(parser, args) -> None:
         })
         exporter = MetricsExporter()
         for topology in topologies:
-            def factory(topology=topology):
-                return uniform_capacity(TOPOLOGIES[topology](), config.link_capacity)
-
             for level in config.load_levels:
-                requests = generate_requests(
-                    factory(), level, config.profile,
-                    base_bandwidth=config.base_bandwidth,
-                    noise=config.noise, seed=seed,
-                )
-                runs = ExperimentRunner().run(
-                    factory, requests, specs, topology=topology,
+                runs, aggregates = executar_celula(
+                    topology, level, config, specs,
                     repetitions=repetitions, seed=seed,
-                    period_order=tuple(config.profile.factors),
                 )
-                aggregates = aggregate_runs(runs)
                 target = args.output / topology / level.name
                 exporter.export_json(runs, target / "runs.json", aggregates=aggregates)
                 exporter.export_csv(runs, target / "runs.csv")
