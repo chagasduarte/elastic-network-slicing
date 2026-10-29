@@ -202,7 +202,7 @@ allocator = SimulatedAnnealingAllocator(
 )
 ```
 
-[SimulatedAnnealingConfig](algorithms/sa/simulated_annealing_config.py) define temperatura inicial `0.25`, temperatura mínima `0.001`, fator de resfriamento `0.9728` e limite de 200 iterações (a temperatura mínima é atingida na iteração 200, de modo que o SA gera 200 vizinhos por alocação, o mesmo número de formigas do ACO; veja `results/calibracao/`). O custo combina quantidade normalizada de saltos, utilização média, utilização do enlace mais ocupado e mudança de caminho, com pesos `0.20`, `0.30`, `0.35` e `0.15`, respectivamente. As utilizações são projetadas considerando a inclusão da demanda atual. Ao alterar os pesos, a soma deve continuar igual a `1.0`.
+[SimulatedAnnealingConfig](algorithms/sa/simulated_annealing_config.py) define temperatura inicial `0.25`, temperatura mínima `0.001`, fator de resfriamento `0.9463` e limite de 100 iterações (a temperatura mínima é atingida na iteração 100; o SA gera 100 vizinhos por alocação, escolha feita para igualar o tempo de decisão ao do ACO e do Q-Learning, e não o número de candidatos; veja `results/calibracao/`). O custo combina quantidade normalizada de saltos, utilização média, utilização do enlace mais ocupado e mudança de caminho, com pesos `0.20`, `0.30`, `0.35` e `0.15`, respectivamente. As utilizações são projetadas considerando a inclusão da demanda atual. Ao alterar os pesos, a soma deve continuar igual a `1.0`.
 
 Há uma limitação existente no tratamento de demandas inviáveis do SA, descrita abaixo.
 
