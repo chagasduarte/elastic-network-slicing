@@ -1,0 +1,134 @@
+[
+ [
+  "aco",
+  "al0.5_be1.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 0.5,
+   "beta": 1.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al0.5_be2.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 0.5,
+   "beta": 2.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al0.5_be4.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 0.5,
+   "beta": 4.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al1.0_be1.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 1.0,
+   "beta": 1.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al1.0_be2.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 1.0,
+   "beta": 2.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al1.0_be4.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 1.0,
+   "beta": 4.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al2.0_be1.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 2.0,
+   "beta": 1.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al2.0_be2.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 2.0,
+   "beta": 2.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al2.0_be4.0_ev0.1_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 2.0,
+   "beta": 4.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al1.0_be1.0_ev0.3_dep1.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 1.0,
+   "beta": 1.0,
+   "evaporation_rate": 0.3,
+   "pheromone_deposit": 1.0
+  }
+ ],
+ [
+  "aco",
+  "al1.0_be1.0_ev0.1_dep5.0",
+  {
+   "ants_count": 10,
+   "iterations": 20,
+   "alpha": 1.0,
+   "beta": 1.0,
+   "evaporation_rate": 0.1,
+   "pheromone_deposit": 5.0
+  }
+ ]
+]

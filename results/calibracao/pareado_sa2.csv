@@ -1,0 +1,7 @@
+algorithm,label,n,base,d_served_ratio,se_served_ratio,d_acceptance_rate,se_acceptance_rate,d_max_utilization_percent,se_max_utilization_percent,d_jain_period_mean,se_jain_period_mean,d_mean_hops,se_mean_hops,mean_decision_ms_parallel
+sa,n200_Tmin0.01_att30_st20,15,n200_Tmin0.001_att30_st20,0.00264,0.00124,0.00187,0.00099,0.05,0.04849,0.00231,0.00199,0.01145,0.00857,73.28
+sa,n200_Tmin0.001_att30_st10,15,n200_Tmin0.001_att30_st20,0.00255,0.00166,0.00167,0.00123,0.075,0.05289,0.00383,0.00228,0.02556,0.01529,69.24
+sa,n200_Tmin0.001_att10_st20,15,n200_Tmin0.001_att30_st20,0.00216,0.00127,0.00139,0.00092,0.04167,0.0541,0.00207,0.00224,0.00838,0.0144,52.0
+sa,n200_Tmin0.001_att60_st20,15,n200_Tmin0.001_att30_st20,0.00118,0.0008,0.00083,0.00057,0.0,0.0,-0.00011,8e-05,-0.00314,0.00215,102.86
+sa,n200_Tmin0.001_att30_st20,15,n200_Tmin0.001_att30_st20,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,69.42
+sa,n200_Tmin0.001_att30_st40,15,n200_Tmin0.001_att30_st20,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,60.64
