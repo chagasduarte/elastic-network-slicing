@@ -300,6 +300,19 @@ python3.11 -m experiments.run_all --estimar                                     
 
 Sobrescritas: `--topologies`, `--algorithms`, `--repetitions`, `--seed`, `--output-root`. A execução é sequencial (o tempo de decisão é métrica). Cada célula (topologia, nível) é gravada atomicamente em `<topologia>/<nível>/` (`runs.json`, `runs.csv`, `aggregates.csv`, `celula.json`); na raiz ficam `config_usada.json`, `metadados.json` (commit, árvore suja, Python, data/hora), `todas_execucoes.csv` e `todos_agregados.csv` (com `topology`, `load_level`, `requests`, `multiplier`).
 
+### Estimativa de tempo e sonda da grade
+
+```bash
+# Sonda da grade de cargas só com o PETIC (rápida; não mede ACO/SA/Q-Learning)
+python3.11 -m experiments.sonda_grade --config experiments/configs/default.json
+# Estimativa só do PETIC (segundos)
+python3.11 -m experiments.run_all --estimar --algorithms petic
+# Estimativa com os 4 algoritmos: rodar SEM outras cargas na máquina (tempo é métrica)
+python3.11 -m experiments.run_all --estimar
+```
+
+`--estimar` roda uma versão reduzida (as 2 menores topologias com 2 repetições em todos os níveis; as demais só no primeiro e no último nível, 1 repetição), grava em `results/<data>-estimativa/` e imprime o tempo medido por célula e a extrapolação (central e [baixo; alto]) para a matriz da config, também em `estimativa.json`. Interpola linearmente pelo número de requisições; não inclui a variância entre repetições.
+
 ## Testes
 
 Execute a suíte com a biblioteca padrão:
