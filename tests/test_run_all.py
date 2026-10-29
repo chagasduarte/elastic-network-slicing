@@ -122,6 +122,34 @@ class RunAllTest(unittest.TestCase):
         meta = json.loads((pasta / "metadados.json").read_text(encoding="utf-8"))
         self.assertEqual(len(meta["retomadas"]), 1)
 
+    def test_resume_acumula_contagem_de_celulas_nos_metadados(self):
+        rodar("--config", str(self.config), "--output-root", str(self.raiz))
+        pasta = self.execucao()
+        import shutil
+        shutil.rmtree(pasta / "abilene" / "b")
+        rodar("--config", str(self.config), "--output-root", str(self.raiz), "--resume")
+        meta = json.loads((pasta / "metadados.json").read_text(encoding="utf-8"))
+        self.assertEqual(meta["celulas_executadas"], 3)
+        self.assertEqual(meta["celulas_puladas"], 1)
+
+    def test_info_git_detecta_alteracao_fora_de_experiments(self):
+        import subprocess
+        from unittest import mock
+        repo = self.tmp / "repo"
+        (repo / "experiments").mkdir(parents=True)
+        (repo / "algoritmo.py").write_text("a = 1\n", encoding="utf-8")
+        (repo / "experiments" / "x.py").write_text("b = 1\n", encoding="utf-8")
+        git = ["git", "-c", "user.name=t", "-c", "user.email=t@t"]
+        subprocess.run([*git, "init", "-q"], cwd=repo, check=True)
+        subprocess.run([*git, "add", "."], cwd=repo, check=True)
+        subprocess.run([*git, "commit", "-qm", "i"], cwd=repo, check=True)
+        with mock.patch.object(run_all, "RAIZ_REPO", repo):
+            self.assertFalse(run_all.info_git()["arvore_suja"])
+            (repo / "algoritmo.py").write_text("a = 2\n", encoding="utf-8")
+            info = run_all.info_git()
+        self.assertTrue(info["arvore_suja"])
+        self.assertEqual(len(info["commit"]), 40)
+
     def test_resume_refaz_celula_com_assinatura_diferente(self):
         rodar("--config", str(self.config), "--output-root", str(self.raiz),
               "--repetitions", "1")

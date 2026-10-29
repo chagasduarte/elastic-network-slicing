@@ -25,6 +25,7 @@ from experiments.cli import ALGORITHMS, TOPOLOGIES, create_algorithm_specs, exec
 from experiments.scenarios import LoadLevel, ScenarioConfig, load_config
 from metrics.exporter import MetricsExporter
 
+RAIZ_REPO = Path(__file__).resolve().parent.parent
 MARCADOR = "celula.json"
 ARQUIVOS_CELULA = ("runs.json", "runs.csv", "aggregates.csv")
 
@@ -165,7 +166,7 @@ def _git(*args) -> str | None:
     try:
         saida = subprocess.run(
             ["git", *args], capture_output=True, text=True, check=True,
-            cwd=Path(__file__).resolve().parent,
+            cwd=RAIZ_REPO,
         )
     except (OSError, subprocess.CalledProcessError):
         return None
@@ -243,8 +244,12 @@ def executar(
               f"| ETA {_formatar(restante)}")
     arquivos = consolidar(raiz, celulas)
     total = relogio() - inicio
-    metadados.update({"duracao_segundos": total, "celulas_executadas": len(pendentes),
-                      "celulas_puladas": puladas})
+    # Em retomadas, acumula em vez de sobrescrever o que as execuções anteriores gravaram.
+    metadados.update({
+        "duracao_segundos": metadados.get("duracao_segundos", 0.0) + total,
+        "celulas_executadas": metadados.get("celulas_executadas", 0) + len(pendentes),
+        "celulas_puladas": puladas,
+    })
     return {"executadas": len(pendentes), "puladas": puladas,
             "duracoes": duracoes, "consolidados": arquivos, "total": total}
 
@@ -296,7 +301,7 @@ def main(argv=None) -> None:
         if desconhecidas:
             raise ValueError(f"Topologias desconhecidas: {desconhecidas}")
         algoritmos = args.algorithms or list(config.algorithms)
-        repeticoes = args.repetitions or config.repetitions
+        repeticoes = config.repetitions if args.repetitions is None else args.repetitions
         seed = config.seed if args.seed is None else args.seed
         retomar = args.resume is not None
         if args.estimar and retomar:
