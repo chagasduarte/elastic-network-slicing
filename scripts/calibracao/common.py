@@ -51,6 +51,7 @@ class CountingAllocator:
         self.inner = inner
         self.counts = Counter()
         self.calls = 0
+        self.searched = Counter()
         if algorithm == "aco":
             wrap(inner, "_build_ant_path", self.counts, "construcoes")
             wrap(inner, "_calculate_path_cost", self.counts, "avaliados")
@@ -64,8 +65,15 @@ class CountingAllocator:
             wrap(inner, "_path_cost", self.counts, "avaliados")
 
     def allocate(self, *args, **kwargs):
-        self.calls += 1
-        return self.inner.allocate(*args, **kwargs)
+        before = Counter(self.counts)
+        result = self.inner.allocate(*args, **kwargs)
+        delta = self.counts - before
+        # Só entram as alocações em que a busca realmente rodou (houve
+        # caminho viável de partida); rejeições imediatas não contam esforço.
+        if delta["expansoes"] > 0:
+            self.calls += 1
+            self.searched.update(delta)
+        return result
 
 
 def build_requests(topology, requests, multiplier, scenario_seed):
@@ -101,5 +109,6 @@ def run_one(topology, requests, algorithm, parameters, seed, count=True):
     counters = {}
     if count and holder["alloc"].calls:
         a = holder["alloc"]
-        counters = {k: v / a.calls for k, v in a.counts.items()}
+        counters = {k: v / a.calls for k, v in a.searched.items()}
+        counters["buscas"] = a.calls
     return run, counters

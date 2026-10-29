@@ -1,0 +1,74 @@
+[
+ [
+  "sa",
+  "n200_Tmin0.001_att30_st20",
+  {
+   "initial_temperature": 0.25,
+   "minimum_temperature": 0.001,
+   "cooling_rate": 0.97277,
+   "max_iterations": 200,
+   "neighbor_attempts": 30,
+   "max_neighbor_steps": 20
+  }
+ ],
+ [
+  "sa",
+  "n200_Tmin0.01_att30_st20",
+  {
+   "initial_temperature": 0.25,
+   "minimum_temperature": 0.01,
+   "cooling_rate": 0.984034,
+   "max_iterations": 200,
+   "neighbor_attempts": 30,
+   "max_neighbor_steps": 20
+  }
+ ],
+ [
+  "sa",
+  "n200_Tmin0.001_att10_st20",
+  {
+   "initial_temperature": 0.25,
+   "minimum_temperature": 0.001,
+   "cooling_rate": 0.97277,
+   "max_iterations": 200,
+   "neighbor_attempts": 10,
+   "max_neighbor_steps": 20
+  }
+ ],
+ [
+  "sa",
+  "n200_Tmin0.001_att60_st20",
+  {
+   "initial_temperature": 0.25,
+   "minimum_temperature": 0.001,
+   "cooling_rate": 0.97277,
+   "max_iterations": 200,
+   "neighbor_attempts": 60,
+   "max_neighbor_steps": 20
+  }
+ ],
+ [
+  "sa",
+  "n200_Tmin0.001_att30_st10",
+  {
+   "initial_temperature": 0.25,
+   "minimum_temperature": 0.001,
+   "cooling_rate": 0.97277,
+   "max_iterations": 200,
+   "neighbor_attempts": 30,
+   "max_neighbor_steps": 10
+  }
+ ],
+ [
+  "sa",
+  "n200_Tmin0.001_att30_st40",
+  {
+   "initial_temperature": 0.25,
+   "minimum_temperature": 0.001,
+   "cooling_rate": 0.97277,
+   "max_iterations": 200,
+   "neighbor_attempts": 30,
+   "max_neighbor_steps": 40
+  }
+ ]
+]

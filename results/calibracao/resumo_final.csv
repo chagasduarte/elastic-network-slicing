@@ -1,0 +1,5 @@
+algorithm,label,n,acceptance_rate,served_ratio,max_utilization_percent,jain_period_mean,mean_hops,mean_decision_ms_parallel,construcoes,avaliados,expansoes,served_se
+petic,petic,15,0.73993,0.6497,99.792,0.85824,2.5859,0.15964,,,,0.035443
+q-learning,ql_default,15,0.73993,0.64856,99.708,0.85735,2.5918,40.147,,1997.9,6874.7,0.035058
+aco,aco_default,15,0.74139,0.65096,99.858,0.8794,2.634,31.832,200,117.77,853.27,0.034641
+sa,sa_default,15,0.73514,0.64177,99.692,0.94546,2.9338,57.915,200,188.55,7715.9,0.036379
