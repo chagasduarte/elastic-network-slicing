@@ -118,7 +118,7 @@ def figura_metrica(linhas: list[dict], niveis: list[dict], topologias: list[str]
                    base: str, ylabel: str, log: bool, destino: Path) -> None:
     """Um painel com uma coluna por topologia; eixo x = nível de carga."""
     idx = _indice(linhas)
-    fig, eixos = plt.subplots(1, len(topologias), figsize=(6.5, 3.2), sharey=False, squeeze=False)
+    fig, eixos = plt.subplots(1, len(topologias), figsize=(6.5, 3.4), sharey=False, squeeze=False)
     eixos = eixos[0]
     n = len(ALGORITMOS)
     desloc = [(i - (n - 1) / 2) * 0.07 for i in range(n)]
@@ -142,9 +142,9 @@ def figura_metrica(linhas: list[dict], niveis: list[dict], topologias: list[str]
                         linewidth=1.0, capsize=2, elinewidth=0.8, **ESTILOS[alg])
         ax.set_title(NOMES_TOPOLOGIA.get(topo, topo), fontsize=9)
         ax.set_xticks(range(len(niveis)))
-        ax.set_xticklabels([f"{nv['name']}\n{nv['requests']}×{formatar_numero(float(nv['multiplier']), 1)}"
+        ax.set_xticklabels([f"{nv['name']}\n{nv['requests']}\n×{formatar_numero(float(nv['multiplier']), 1)}"
                             for nv in niveis], fontsize=5)
-        ax.set_xlabel("Nível (requisições×multiplicador)", fontsize=6)
+        ax.set_xlabel("Nível (requisições, multiplicador)", fontsize=6)
         ax.tick_params(axis="y", labelsize=7)
         if log:
             ax.set_yscale("log")
