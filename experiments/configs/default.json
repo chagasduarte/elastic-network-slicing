@@ -1,5 +1,5 @@
 {
-  "topologies": ["abilene", "nobel-germany", "geant", "germany50"],
+  "topologies": ["abilene", "nobel-germany", "geant"],
   "link_capacity": 800,
   "seed": 42,
   "repetitions": 10,
