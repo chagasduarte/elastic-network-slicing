@@ -1,0 +1,8 @@
+algorithm,label,parameters,allocations,mean_ms,median_ms,p95_ms
+petic,petic,{},1680,0.075,0.06,0.165
+q-learning,ep250,"{""episodes"": 250}",1680,2.813,2.418,6.718
+q-learning,ep500,"{""episodes"": 500}",1680,3.552,3.427,8.351
+q-learning,ep1000,"{""episodes"": 1000}",1680,5.683,5.563,13.374
+q-learning,ep2000_default,{},1680,9.78,9.778,23.011
+q-learning,ep4000,"{""episodes"": 4000}",1680,19.03,18.887,44.275
+q-learning,ep1000_ed0.99,"{""episodes"": 1000, ""epsilon_decay"": 0.99}",1680,4.676,4.807,10.718
