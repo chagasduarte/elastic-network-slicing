@@ -1,0 +1,6 @@
+[["petic","petic",null],
+ ["q-learning","ep250",{"episodes":250}],
+ ["q-learning","ep500",{"episodes":500}],
+ ["q-learning","ep1000",{"episodes":1000}],
+ ["q-learning","ep2000",{"episodes":2000}],
+ ["q-learning","ep4000",{"episodes":4000}]]
