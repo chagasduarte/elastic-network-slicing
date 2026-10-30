@@ -2,7 +2,7 @@
   "topologies": ["abilene", "nobel-germany", "geant"],
   "link_capacity": 800,
   "seed": 42,
-  "repetitions": 10,
+  "repetitions": 30,
   "algorithms": ["petic", "aco", "sa", "q-learning"],
   "base_bandwidth": 40,
   "noise": 0.3,

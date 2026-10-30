@@ -20,6 +20,7 @@ def _linhas_sinteticas():
             linha[f"{BASE}.stddev"] = "0.0" if det else "1.25"
             linha[f"{BASE}.ci95_low"] = "90.5" if det else "89.5"
             linha[f"{BASE}.ci95_high"] = "90.5" if det else "91.5"
+            linha[f"{BASE}.count"] = "30"
             linhas.append(linha)
     return linhas
 
@@ -70,6 +71,17 @@ class TestSaidas(unittest.TestCase):
         self.assertIn("% fonte: results/x/todos_agregados.csv, colunas acceptance.acceptance_percent.mean", tex)
         self.assertIn("90,50 $\\pm$ 1,25", tex)
         self.assertIn("[89,50; 91,50]", tex)
+
+    def test_tabela_por_periodo_separa_aceitacao_e_banda(self):
+        row = {"topology": "abilene", "load_level": "l6", "algorithm": "petic",
+               "period": "t1", "acceptance.acceptance_percent.mean": "92.5",
+               "bandwidth.served_percent.mean": "92.1"}
+        tex = plots.tabela_periodos([row], NIVEIS + [{"name": "l6", "requests": 80,
+                                                       "multiplier": 4.0}],
+                                    "abilene", "results/x/todos_agregados.csv")
+        self.assertIn("t1", tex)
+        self.assertIn("92,50", tex)
+        self.assertIn("92,10", tex)
 
 
 if __name__ == "__main__":

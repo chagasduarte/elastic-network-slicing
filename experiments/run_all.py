@@ -11,6 +11,7 @@ manter a rotação de ordem entre repetições feita pelo ExperimentRunner.
 import argparse
 import csv
 from dataclasses import dataclass
+from dataclasses import replace
 from datetime import datetime
 import json
 import os
@@ -23,6 +24,7 @@ import time
 
 from experiments.cli import ALGORITHMS, TOPOLOGIES, create_algorithm_specs, executar_celula
 from experiments.scenarios import LoadLevel, ScenarioConfig, load_config
+from metrics.aggregation import aggregate_runs
 from metrics.exporter import MetricsExporter
 
 RAIZ_REPO = Path(__file__).resolve().parent.parent
@@ -225,13 +227,28 @@ def executar(
         saida(f"[{indice}/{len(pendentes)}] {celula.rotulo} "
               f"({celula.level.requests} requisições, {celula.repetitions} rep.) ...")
         comeco = relogio()
-        runs, agregados = executar_celula(
-            celula.topology, celula.level, config, specs,
-            repetitions=celula.repetitions, seed=seed,
-        )
+        # Cada repetição representa um cenário independente. Todos os
+        # algoritmos recebem a mesma demanda dentro do cenário; a semente
+        # muda entre cenários para que a unidade amostral seja a demanda.
+        runs = []
+        for indice_cenario in range(celula.repetitions):
+            semente_cenario = seed + indice_cenario
+            execucoes, _ = executar_celula(
+                celula.topology, celula.level, config, specs,
+                repetitions=1, seed=semente_cenario,
+            )
+            runs.extend(execucoes)
+        # Arquivo agregado para figuras/tabelas: um grupo por algoritmo e
+        # célula, com cada cenário independente como observação.
+        runs_para_agregar = [
+            replace(run, metadata=replace(run.metadata, scenario_id="all-scenarios"))
+            for run in runs
+        ]
+        agregados = aggregate_runs(runs_para_agregar)
         duracao = relogio() - comeco
         gravar_celula(raiz, celula, runs, agregados, {
             "assinatura": _assinatura(config, celula, specs, seed),
+            "sementes_cenarios": [seed + i for i in range(celula.repetitions)],
             "duracao_segundos": duracao,
             "tempo_alocacao_segundos": tempos_de_alocacao(runs),
             "concluida_em": datetime.now().isoformat(timespec="seconds"),
@@ -345,7 +362,8 @@ def main(argv=None) -> None:
                 "modo": "estimativa" if args.estimar else "completo",
                 "celulas": [
                     {"topology": c.topology, "load_level": c.level.name,
-                     "repetitions": c.repetitions} for c in celulas
+                     "repetitions": c.repetitions,
+                     "unit": "independent_scenario"} for c in celulas
                 ],
             }
         _gravar_metadados(raiz, metadados)

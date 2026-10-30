@@ -77,11 +77,26 @@ class RunAllTest(unittest.TestCase):
         self.assertEqual({l["load_level"] for l in linhas}, {"a", "b"})
         self.assertEqual({l["topology"] for l in linhas}, {"abilene"})
         resumos = [l for l in linhas if l["scope"] == "summary"]
-        # 2 níveis x 2 algoritmos x 2 repetições
+        # 2 níveis x 2 algoritmos x 2 cenários independentes
         self.assertEqual(len(resumos), 8)
+        for nivel in ("a", "b"):
+            por_algoritmo = {
+                algoritmo: {l["scenario_id"] for l in resumos
+                            if l["load_level"] == nivel and l["algorithm"] == algoritmo}
+                for algoritmo in ("petic", "q-learning")
+            }
+            self.assertEqual(len(por_algoritmo["petic"]), 2)
+            self.assertEqual(por_algoritmo["petic"], por_algoritmo["q-learning"])
+            self.assertEqual(
+                {l["seed"] for l in resumos
+                 if l["load_level"] == nivel and l["algorithm"] == "petic"},
+                {"7", "8"},
+            )
         with (pasta / "todos_agregados.csv").open(encoding="utf-8", newline="") as f:
             agregados = list(csv.DictReader(f))
         self.assertEqual({l["load_level"] for l in agregados}, {"a", "b"})
+        sumarios = [l for l in agregados if l["scope"] == "summary"]
+        self.assertTrue(all(l["scenario_id"] == "all-scenarios" for l in sumarios))
 
     def test_dry_run_nao_grava(self):
         saida = rodar("--config", str(self.config), "--output-root", str(self.raiz),

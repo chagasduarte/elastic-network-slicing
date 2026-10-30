@@ -102,11 +102,13 @@ class ExperimentRunner:
                             last[1] if last is not None
                             and last[0] == period_index - 1 else None
                         )
-                        started = time.perf_counter()
+                        # Tempo de CPU evita incluir espera por carga externa,
+                        # suspensão do processo e throttling por outros jobs.
+                        started = time.process_time()
                         result = allocator.allocate(
                             graph, request, demand, previous_result
                         )
-                        elapsed = time.perf_counter() - started
+                        elapsed = time.process_time() - started
                         self._validate_result(graph, request, demand, result)
                         if result.accepted:
                             service.reserve(
@@ -125,7 +127,9 @@ class ExperimentRunner:
                     algorithm=spec.name,
                     topology=topology,
                     run_id=f"{scenario_id}:{spec.name}:{repetition + 1}",
-                    seed=run_seed,
+                    # A semente registrada identifica o cenário pareado mesmo
+                    # quando o algoritmo é determinístico e recebe None.
+                    seed=seed + repetition,
                     parameters=deepcopy(spec.parameters),
                     scenario_id=scenario_id,
                 )

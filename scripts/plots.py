@@ -7,10 +7,9 @@ Saídas: <run>/figuras/*.pdf e <run>/tabelas/*.tex. Todo número vem de
 <run>/todos_agregados.csv (escopo "summary"); nada é calculado ou arredondado
 além da formatação de exibição.
 
-Nota estatística (registrada nas legendas): o PETIC é determinístico (desvio
-e IC 95% nulos) e o conjunto de requisições é fixo por topologia x nível;
-logo o IC 95% reflete apenas a aleatoriedade interna dos algoritmos
-estocásticos (ACO, SA e Q-Learning).
+Nota estatística: cada repetição é um conjunto independente de requisições;
+os algoritmos compartilham o conjunto dentro de cada cenário. Média, desvio e
+IC 95% são calculados entre cenários (n=30 na matriz principal).
 
 Rótulos \\label das tabelas: tab:<aceitacao|banda|tempo>-<topologia>
 (ex.: tab:aceitacao-abilene, tab:banda-geant, tab:tempo-nobel-germany).
@@ -60,12 +59,11 @@ METRICAS = {
 }
 
 NOTA_TEMPO = (
-    "Barras: IC 95% (10 repetições). Tempo é medido, por isso o PETIC também tem variação; "
+    "Barras: IC 95% entre cenários independentes (n={n}); tempo de CPU de allocate, "
     "escala logarítmica."
 )
 NOTA_ESTATISTICA = (
-    "Barras: IC 95% (10 repetições). PETIC é determinístico (sem barra); "
-    "o IC reflete só a aleatoriedade dos algoritmos estocásticos."
+    "Barras: IC 95% entre cenários independentes (n={n}); algoritmos pareados por cenário."
 )
 
 
@@ -118,6 +116,8 @@ def figura_metrica(linhas: list[dict], niveis: list[dict], topologias: list[str]
                    base: str, ylabel: str, log: bool, destino: Path) -> None:
     """Um painel com uma coluna por topologia; eixo x = nível de carga."""
     idx = _indice(linhas)
+    ns = [_num(l.get(f"{base}.count")) for l in linhas]
+    n_cenarios = max((int(n) for n in ns if n is not None), default=0)
     fig, eixos = plt.subplots(1, len(topologias), figsize=(6.5, 3.4), sharey=False, squeeze=False)
     eixos = eixos[0]
     n = len(ALGORITMOS)
@@ -153,7 +153,8 @@ def figura_metrica(linhas: list[dict], niveis: list[dict], topologias: list[str]
     handles, rotulos = eixos[0].get_legend_handles_labels()
     fig.legend(handles, rotulos, loc="lower center", ncol=n, fontsize=8, frameon=False,
                bbox_to_anchor=(0.5, 0.035))
-    fig.text(0.5, 0.012, NOTA_TEMPO if log else NOTA_ESTATISTICA, ha="center", fontsize=5.5)
+    nota = NOTA_TEMPO if log else NOTA_ESTATISTICA
+    fig.text(0.5, 0.012, nota.format(n=n_cenarios), ha="center", fontsize=5.5)
     fig.tight_layout(rect=(0, 0.11, 1, 1))
     destino.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(destino, format="pdf", metadata={"Creator": "scripts.plots", "Producer": "matplotlib",
@@ -186,9 +187,9 @@ def tabela_latex(linhas: list[dict], niveis: list[dict], topo: str, chave: str, 
     rotulo = f"tab:{chave}-{topo}"
     out = [
         f"% fonte: {caminho_csv}, colunas {base}.mean, {base}.stddev, {base}.ci95_low, {base}.ci95_high",
-        "% escopo summary; desvio-padrão amostral (n-1) e IC 95% de 10 repetições.",
-        ("% tempo medido: PETIC também varia entre repetições." if chave == "tempo" else
-         "% PETIC é determinístico (desvio e IC nulos); o IC reflete só a aleatoriedade dos estocásticos."),
+        "% escopo summary; unidade amostral: cenário independente; desvio-padrão amostral (n-1) e IC 95% entre cenários.",
+        ("% tempo de CPU medido apenas durante allocate." if chave == "tempo" else
+         "% os algoritmos compartilham as requisições em cada cenário."),
         "\\begin{table}[htb]",
         "    \\centering",
         "    \\small",
@@ -217,11 +218,44 @@ def tabela_latex(linhas: list[dict], niveis: list[dict], topo: str, chave: str, 
     return "\n".join(out)
 
 
+def tabela_periodos(linhas: list[dict], niveis: list[dict], topo: str,
+                    caminho_csv: str) -> str:
+    """Aceitação e banda atendida separadas por período, sem mistura de cargas."""
+    periodos = sorted({l["period"] for l in linhas
+                       if l["topology"] == topo and l.get("period") not in (None, "")})
+    indice = {(l["load_level"], l["algorithm"], l["period"]): l for l in linhas
+              if l["topology"] == topo and l.get("period") not in (None, "")}
+    out = [
+        f"% fonte: {caminho_csv}; scope=period, acceptance.acceptance_percent.mean, bandwidth.served_percent.mean",
+        "% unidade amostral: cenário independente; valores separados por período.",
+        "\\begin{table}[htb]", "    \\centering", "    \\scriptsize",
+        f"    \\caption{{Aceitação e banda atendida por período em {NOMES_TOPOLOGIA.get(topo, topo)} (\\%)}}",
+        f"    \\label{{tab:periodos-{topo}}}",
+        "    \\begin{tabular}{llr r}", "        \\hline",
+        "        Nível & Algoritmo & Aceitação & Banda atendida \\", "        \\hline",
+    ]
+    for nivel in niveis:
+        for alg in ALGORITMOS:
+            for periodo in periodos:
+                linha = indice.get((nivel["name"], alg, periodo))
+                if linha is None:
+                    continue
+                ace = _num(linha.get("acceptance.acceptance_percent.mean"))
+                banda = _num(linha.get("bandwidth.served_percent.mean"))
+                rotulo = f"{nivel['name']}, {periodo}"
+                out.append(f"        {rotulo} & {NOMES_ALGORITMO[alg]} & {formatar_numero(ace, 2)} & {formatar_numero(banda, 2)} \\")
+        out.append("        \\hline")
+    out += ["    \\end{tabular}", "    \\fonte{Elaborado pelo autor.}", "\\end{table}", ""]
+    return "\n".join(out)
+
+
 # ---------------------------------------------------------------- CLI
 
 def gerar(run: Path) -> tuple[list[Path], list[Path]]:
     csv_path = run / "todos_agregados.csv"
     linhas = ler_agregados(csv_path)
+    with csv_path.open(encoding="utf-8", newline="") as fluxo:
+        linhas_todas = list(csv.DictReader(fluxo))
     niveis = niveis_da_config(run)
     topologias = [t for t in NOMES_TOPOLOGIA if any(l["topology"] == t for l in linhas)]
     topologias += sorted({l["topology"] for l in linhas} - set(topologias))
@@ -237,6 +271,11 @@ def gerar(run: Path) -> tuple[list[Path], list[Path]]:
             destino.write_text(tabela_latex(linhas, niveis, topo, chave, f"{run.as_posix()}/todos_agregados.csv"),
                                encoding="utf-8")
             tabelas.append(destino)
+        destino = run / "tabelas" / f"periodos_{topo}.tex"
+        destino.write_text(tabela_periodos(linhas_todas, niveis, topo,
+                                           f"{run.as_posix()}/todos_agregados.csv"),
+                           encoding="utf-8")
+        tabelas.append(destino)
     return figuras, tabelas
 
 
