@@ -156,7 +156,7 @@ def comparar(run: Path, linhas):
                                 l["wilcoxon_exact_holm"], float(o["wilcoxon_holm"])))
     print(f"{len(linhas)} comparações verificadas.")
     print(f"maior diferença absoluta na média (p.p.): {max_media:.2e}")
-    print(f"maior diferença absoluta no p bicaudal (exato x normal c/ correção): {max_p:.3f}")
+    print(f"maior diferença absoluta no p bicaudal (Wilcoxon exato desta verificação x p da análise do Codex): {max_p:.3f}")
     print(f"divergências na decisão após Holm (alfa 0,05): {len(div_decisao)}")
     for d in div_decisao:
         print("  ", d)
