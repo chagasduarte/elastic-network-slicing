@@ -3,10 +3,14 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.paired_analysis import analisar
+from scripts.paired_analysis import _wilcoxon_pvalue, analisar
 
 
 class PairedAnalysisTest(unittest.TestCase):
+    def test_wilcoxon_exato_bicaudal(self):
+        self.assertEqual(_wilcoxon_pvalue([1.0, 2.0, 3.0]), 0.25)
+        self.assertEqual(_wilcoxon_pvalue([0.0, 0.0]), 1.0)
+
     def test_pareia_por_scenario_e_exporta_inferencia_ajustada(self):
         with tempfile.TemporaryDirectory() as tmp:
             run = Path(tmp)

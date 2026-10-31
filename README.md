@@ -202,7 +202,7 @@ allocator = SimulatedAnnealingAllocator(
 )
 ```
 
-[SimulatedAnnealingConfig](algorithms/sa/simulated_annealing_config.py) define temperatura inicial `0.25`, temperatura mínima `0.001`, fator de resfriamento `0.9463` e limite de 100 iterações (a temperatura mínima é atingida na iteração 100; o SA gera 100 vizinhos por alocação, escolha feita para igualar o tempo de decisão ao do ACO e do Q-Learning, e não o número de candidatos; veja `results/calibracao/`). O custo combina quantidade normalizada de saltos, utilização média, utilização do enlace mais ocupado e mudança de caminho, com pesos `0.20`, `0.30`, `0.35` e `0.15`, respectivamente. As utilizações são projetadas considerando a inclusão da demanda atual. Ao alterar os pesos, a soma deve continuar igual a `1.0`.
+[SimulatedAnnealingConfig](algorithms/sa/simulated_annealing_config.py) define temperatura inicial `0.25`, temperatura mínima `0.001`, fator de resfriamento `0.9463` e limite de 100 iterações (a temperatura mínima é atingida na iteração 100). O limite foi escolhido como orçamento de busca e não iguala o tempo de decisão ao do ACO ou do Q-Learning. O custo combina quantidade normalizada de saltos, utilização média, utilização do enlace mais ocupado e mudança de caminho, com pesos `0.20`, `0.30`, `0.35` e `0.15`, respectivamente. As utilizações são projetadas considerando a inclusão da demanda atual. Ao alterar os pesos, a soma deve continuar igual a `1.0`.
 
 Há uma limitação existente no tratamento de demandas inviáveis do SA, descrita abaixo.
 
@@ -298,7 +298,27 @@ python3.11 -m experiments.run_all --resume                                      
 python3.11 -m experiments.run_all --estimar                                             # roda versão reduzida e extrapola o tempo
 ```
 
-Sobrescritas: `--topologies`, `--algorithms`, `--repetitions`, `--seed`, `--output-root`. A execução é sequencial (o tempo de decisão é métrica). Cada célula (topologia, nível) é gravada atomicamente em `<topologia>/<nível>/` (`runs.json`, `runs.csv`, `aggregates.csv`, `celula.json`); na raiz ficam `config_usada.json`, `metadados.json` (commit, árvore suja, Python, data/hora), `todas_execucoes.csv` e `todos_agregados.csv` (com `topology`, `load_level`, `requests`, `multiplier`).
+Sobrescritas: `--topologies`, `--algorithms`, `--repetitions`, `--seed`, `--output-root`. A configuração padrão usa 30 cenários independentes por célula. Em cada cenário todos os algoritmos recebem as mesmas requisições, e a semente muda entre cenários. A execução é sequencial; cada célula (topologia, nível) é gravada atomicamente em `<topologia>/<nível>/` (`runs.json`, `runs.csv`, `aggregates.csv`, `celula.json`). Na raiz ficam `config_usada.json`, `metadados.json` (commit, árvore suja, Python, data/hora), `todas_execucoes.csv` (observações por cenário) e `todos_agregados.csv` (médias e intervalos calculados entre cenários).
+
+Após a matriz, rode os testes pareados de aceitação contra o PETIC e gere IC bootstrap, p-valores de Wilcoxon com ajuste de Holm e tamanho de efeito:
+
+```bash
+python3.11 -m scripts.paired_analysis --run results/<AAAAMMDD-HHMMSS>
+```
+
+O script escreve `analise_pareada_aceitacao.csv` na pasta da execução. A implementação independente da Forja pode ser executada para conferir o teste exato e Holm:
+
+```bash
+python3.11 -m scripts.verificacao_estatistica --run results/<AAAAMMDD-HHMMSS>
+```
+
+Para gerar figuras PDF e tabelas LaTeX, incluindo tabelas de aceitação e banda por período:
+
+```bash
+MPLCONFIGDIR=/tmp/matplotlib python3.11 -m scripts.plots --run results/<AAAAMMDD-HHMMSS>
+```
+
+Os parâmetros estatísticos usados estão documentados nos scripts e no capítulo de metodologia da monografia.
 
 ### Estimativa de tempo e sonda da grade
 
@@ -311,7 +331,7 @@ python3.11 -m experiments.run_all --estimar --algorithms petic
 python3.11 -m experiments.run_all --estimar
 ```
 
-`--estimar` roda uma versão reduzida (as 2 menores topologias com 2 repetições em todos os níveis; as demais só no primeiro e no último nível, 1 repetição), grava em `results/<data>-estimativa/` e imprime o tempo medido por célula e a extrapolação (central e [baixo; alto]) para a matriz da config, também em `estimativa.json`. Interpola linearmente pelo número de requisições; não inclui a variância entre repetições.
+`--estimar` roda uma versão reduzida (as 2 menores topologias com 2 cenários em todos os níveis; as demais só no primeiro e no último nível, 1 cenário), grava em `results/<data>-estimativa/` e imprime o tempo medido por célula e a extrapolação (central e [baixo; alto]) para a matriz da config, também em `estimativa.json`. Interpola linearmente pelo número de requisições; não inclui a variância entre cenários.
 
 ## Testes
 
@@ -329,7 +349,7 @@ Os testes verificam o contrato do Q-learning, capacidade por período, rejeiçõ
 
 - **Saturação:** enlaces (e pares enlace-período) com utilização ≥ 80%, ≥ 90% e = 100% (`saturated_links_80`, `saturated_links_90`, `saturated_links`).
 - **Jain:** `fairness_jain` mistura todos os pares enlace-período; `fairness_jain_period_mean` é a média dos índices calculados em cada período.
-- **Entre repetições** (`metrics/aggregation.py`): média, mediana, mínimo, máximo, desvio-padrão **amostral** (n − 1) e intervalo de confiança de 95% pela t de Student (`ci95_low`, `ci95_high`), calculados em `metrics/intervals.py` só com a biblioteca padrão. Com uma única repetição, desvio e intervalo são `None`.
+- **Entre cenários** (`metrics/aggregation.py`): média, mediana, mínimo, máximo, desvio-padrão **amostral** (n − 1) e intervalo de confiança de 95% pela t de Student (`ci95_low`, `ci95_high`), calculados em `metrics/intervals.py` só com a biblioteca padrão. Com uma única observação, desvio e intervalo são `None`.
 - Desvios dentro de uma execução (tempos das decisões, utilização dos enlaces) continuam populacionais, pois descrevem todas as observações daquela execução.
 
 Dependências de desenvolvimento (`requirements-dev.txt`): `scipy`, usado apenas para conferir a tabela de quantis t nos testes.
@@ -337,7 +357,7 @@ Dependências de desenvolvimento (`requirements-dev.txt`): `scipy`, usado apenas
 ## Estado atual e limitações
 
 - O programa executa uma requisição com vários períodos. Experimentos com várias requisições exigem adaptar o fluxo de `main.py` e compartilhar o grafo entre elas.
-- O Q-learning treina novamente a cada demanda; não há persistência da tabela Q nem aprendizado entre execuções. Os algoritmos usam objetivos distintos, por isso comparar apenas a aceitação não mede qualidade de caminho ou custo de busca.
+- O Q-learning treina novamente a cada demanda; não há persistência da tabela Q nem aprendizado entre execuções. PETIC, ACO e Q-learning usam o mesmo custo aditivo de caminho (o PETIC o minimiza exatamente e os outros dois o aproximam); o SA usa uma função multiobjetivo própria. A comparação externa inclui aceitação, banda, Jain, reutilização, caminhos e tempo.
 - No SA, a rejeição por ausência de caminho viável chama `SliceResult` com `period_id`, mas o modelo espera `demand_id`. Esse caso gera `TypeError` e precisa ser corrigido antes de usar o SA em experimentos com rejeições.
 
 Para comparar algoritmos, recrie o grafo a cada execução independente, use as mesmas demandas e capacidades e registre os parâmetros e sementes utilizados.

@@ -82,6 +82,7 @@ class TestSaidas(unittest.TestCase):
         self.assertIn("t1", tex)
         self.assertIn("92,50", tex)
         self.assertIn("92,10", tex)
+        self.assertTrue(any(line.endswith(" \\\\") for line in tex.splitlines()))
 
 
 if __name__ == "__main__":

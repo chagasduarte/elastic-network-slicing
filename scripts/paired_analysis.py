@@ -9,9 +9,8 @@ from __future__ import annotations
 
 import argparse
 import csv
-import math
 import random
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 from statistics import median
 
@@ -32,23 +31,24 @@ def _postos_com_empate(valores: list[float]) -> list[float]:
 
 
 def _wilcoxon_pvalue(diferencas: list[float]) -> float:
-    """p bicaudal por aproximação normal do teste de postos sinalizados."""
+    """p bicaudal exato do teste de postos sinalizados, com empates nos postos."""
     pares = [(d, abs(d)) for d in diferencas if d != 0]
     n = len(pares)
     if n == 0:
         return 1.0
     valores = [d for d, _ in pares]
-    postos = _postos_com_empate(valores)
-    w_mais = sum(p for p, d in zip(postos, valores) if d > 0)
-    media = n * (n + 1) / 4
-    frequencias = Counter(abs(d) for d in valores)
-    correcao_empates = sum(t ** 3 - t for t in frequencias.values()) / 48
-    variancia = n * (n + 1) * (2 * n + 1) / 24 - correcao_empates
-    if variancia <= 0:
-        return 1.0
-    delta = w_mais - media
-    z = max(0.0, abs(delta) - 0.5) / math.sqrt(variancia)
-    return math.erfc(z / math.sqrt(2))
+    postos_dobrados = [round(2 * p) for p in _postos_com_empate(valores)]
+    w_mais = sum(p for p, d in zip(postos_dobrados, valores) if d > 0)
+    total = sum(postos_dobrados)
+    # Distribuição exata de W+ sob H0: cada posto entra com probabilidade 1/2.
+    formas = [0] * (total + 1)
+    formas[0] = 1
+    for posto in postos_dobrados:
+        for soma in range(total, posto - 1, -1):
+            formas[soma] += formas[soma - posto]
+    menor_cauda = min(w_mais, total - w_mais)
+    p = 2 * sum(formas[:menor_cauda + 1]) / (2 ** n)
+    return min(1.0, p)
 
 
 def analisar(run: Path, *, bootstrap: int = 10000, seed: int = 20261030) -> Path:

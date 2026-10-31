@@ -228,24 +228,25 @@ def tabela_periodos(linhas: list[dict], niveis: list[dict], topo: str,
     out = [
         f"% fonte: {caminho_csv}; scope=period, acceptance.acceptance_percent.mean, bandwidth.served_percent.mean",
         "% unidade amostral: cenário independente; valores separados por período.",
-        "\\begin{table}[htb]", "    \\centering", "    \\scriptsize",
-        f"    \\caption{{Aceitação e banda atendida por período em {NOMES_TOPOLOGIA.get(topo, topo)} (\\%)}}",
-        f"    \\label{{tab:periodos-{topo}}}",
-        "    \\begin{tabular}{llr r}", "        \\hline",
-        "        Nível & Algoritmo & Aceitação & Banda atendida \\", "        \\hline",
     ]
     for nivel in niveis:
-        for alg in ALGORITMOS:
-            for periodo in periodos:
+        out += [
+            "\\begin{table}[htb]", "    \\centering", "    \\scriptsize",
+            f"    \\caption{{Aceitação e banda atendida por período em {NOMES_TOPOLOGIA.get(topo, topo)}, nível {nivel['name']} (\\%)}}",
+            f"    \\label{{tab:periodos-{topo}-{nivel['name']}}}",
+            "    \\begin{tabular}{llrr}", "        \\hline",
+            "        Período & Algoritmo & Aceitação & Banda atendida \\\\", "        \\hline",
+        ]
+        for periodo in periodos:
+            for alg in ALGORITMOS:
                 linha = indice.get((nivel["name"], alg, periodo))
                 if linha is None:
                     continue
                 ace = _num(linha.get("acceptance.acceptance_percent.mean"))
                 banda = _num(linha.get("bandwidth.served_percent.mean"))
-                rotulo = f"{nivel['name']}, {periodo}"
-                out.append(f"        {rotulo} & {NOMES_ALGORITMO[alg]} & {formatar_numero(ace, 2)} & {formatar_numero(banda, 2)} \\")
-        out.append("        \\hline")
-    out += ["    \\end{tabular}", "    \\fonte{Elaborado pelo autor.}", "\\end{table}", ""]
+                out.append(f"        {periodo} & {NOMES_ALGORITMO[alg]} & {formatar_numero(ace, 2)} & {formatar_numero(banda, 2)} \\\\")
+        out += ["        \\hline", "    \\end{tabular}",
+                "    \\fonte{Elaborado pelo autor.}", "\\end{table}", ""]
     return "\n".join(out)
 
 
