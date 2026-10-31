@@ -1,0 +1,40 @@
+
+== geant: 4 requisições x 4 períodos (16 alocações), tempo total sob cProfile 1.0 s
+tempo por alocação (ms, sob cProfile): média 58.8, mín 22.7, máx 191.8
+contadores médios por busca: {'avaliados': 101.0, 'construcoes': 100.0, 'expansoes': 3502.8, 'buscas': 16}
+         1621467 function calls (1508972 primitive calls) in 0.957 seconds
+
+   Ordered by: internal time
+   List reduced from 236 to 8 due to restriction <8>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+56045/2241    0.210    0.000    0.792    0.000 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/algorithms/sa/simulated_annealing_neighbor_generator.py:84(_find_suffix)
+    53804    0.111    0.000    0.258    0.000 /Users/chagasduarte/.local/share/uv/python/cpython-3.11.16-macos-x86_64-none/lib/python3.11/random.py:376(shuffle)
+   123021    0.102    0.000    0.142    0.000 /Users/chagasduarte/.local/share/uv/python/cpython-3.11.16-macos-x86_64-none/lib/python3.11/random.py:235(_randbelow_with_getrandbits)
+59261/3216    0.065    0.000    0.925    0.000 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/scripts/calibracao/common.py:34(wrapper)
+    71130    0.048    0.000    0.101    0.000 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/domain/link.py:22(allocated_bandwidth_at)
+   131319    0.037    0.000    0.070    0.000 {method 'get' of 'dict' objects}
+    73037    0.034    0.000    0.055    0.000 {built-in method builtins.sum}
+    54052    0.030    0.000    0.088    0.000 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/domain/network_graph.py:40(get_neighbors)
+
+
+
+== germany50: 4 requisições x 4 períodos (16 alocações), tempo total sob cProfile 275.4 s
+tempo por alocação (ms, sob cProfile): média 17175.9, mín 71.5, máx 119982.4
+contadores médios por busca: {'avaliados': 101.0, 'construcoes': 100.0, 'expansoes': 1446151.4, 'buscas': 16}
+         479597848 function calls (433318407 primitive calls) in 275.387 seconds
+
+   Ordered by: internal time
+   List reduced from 233 to 8 due to restriction <8>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+23138422/1880   78.609    0.000  275.146    0.146 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/algorithms/sa/simulated_annealing_neighbor_generator.py:84(_find_suffix)
+ 15505779   33.366    0.000   79.125    0.000 /Users/chagasduarte/.local/share/uv/python/cpython-3.11.16-macos-x86_64-none/lib/python3.11/random.py:376(shuffle)
+ 38421389   31.559    0.000   43.666    0.000 /Users/chagasduarte/.local/share/uv/python/cpython-3.11.16-macos-x86_64-none/lib/python3.11/random.py:235(_randbelow_with_getrandbits)
+23141638/3216   23.293    0.000  275.342    0.086 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/scripts/calibracao/common.py:34(wrapper)
+ 23167295   15.381    0.000   30.995    0.000 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/domain/link.py:22(allocated_bandwidth_at)
+ 23138087   11.594    0.000   42.556    0.000 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/domain/link.py:32(available_bandwidth_at)
+ 23169425   10.428    0.000   15.617    0.000 {built-in method builtins.sum}
+ 23138087    9.910    0.000   52.465    0.000 /Users/chagasduarte/Projects/todo_meu_tcc/elastic-network-slicing/domain/link.py:41(supports)
+
+
