@@ -1,0 +1,45 @@
+% fonte: results/20261029-224824/todos_agregados.csv, colunas acceptance.acceptance_percent.mean, acceptance.acceptance_percent.stddev, acceptance.acceptance_percent.ci95_low, acceptance.acceptance_percent.ci95_high
+% escopo summary; desvio-padrão amostral (n-1) e IC 95% de 10 repetições.
+% PETIC é determinístico (desvio e IC nulos); o IC reflete só a aleatoriedade dos estocásticos.
+\begin{table}[htb]
+    \centering
+    \small
+    \caption{Aceitação (\%) na topologia GÉANT: média $\pm$ desvio-padrão amostral [IC 95\%]}
+    \label{tab:aceitacao-geant}
+    \begin{tabular}{llcc}
+        \hline
+        Nível (req.$\times$mult.) & Algoritmo & Média $\pm$ desvio & IC 95\% \\
+        \hline
+        l1 (10$\times$1,0) & PETIC & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & ACO & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & SA & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & Q-Learning & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+        \hline
+        l2 (20$\times$1,5) & PETIC & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & ACO & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & SA & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & Q-Learning & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+        \hline
+        l3 (40$\times$2,0) & PETIC & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & ACO & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & SA & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & Q-Learning & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+        \hline
+        l4 (60$\times$2,5) & PETIC & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & ACO & 99,71 $\pm$ 0,34 & [99,46; 99,95] \\
+         & SA & 99,83 $\pm$ 0,22 & [99,68; 99,99] \\
+         & Q-Learning & 99,58 $\pm$ 0,00 & [99,58; 99,58] \\
+        \hline
+        l5 (80$\times$3,0) & PETIC & 94,69 $\pm$ 0,00 & [94,69; 94,69] \\
+         & ACO & 95,38 $\pm$ 0,69 & [94,88; 95,87] \\
+         & SA & 93,31 $\pm$ 1,13 & [92,50; 94,12] \\
+         & Q-Learning & 94,06 $\pm$ 0,00 & [94,06; 94,06] \\
+        \hline
+        l6 (80$\times$4,0) & PETIC & 86,88 $\pm$ 0,00 & [86,88; 86,88] \\
+         & ACO & 87,62 $\pm$ 0,40 & [87,34; 87,91] \\
+         & SA & 84,44 $\pm$ 1,83 & [83,13; 85,75] \\
+         & Q-Learning & 87,19 $\pm$ 0,00 & [87,19; 87,19] \\
+        \hline
+    \end{tabular}
+    \fonte{Elaborado pelo autor.}
+\end{table}

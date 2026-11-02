@@ -1,0 +1,45 @@
+% fonte: results/20261029-224824/todos_agregados.csv, colunas timing.total_seconds.mean, timing.total_seconds.stddev, timing.total_seconds.ci95_low, timing.total_seconds.ci95_high
+% escopo summary; desvio-padrão amostral (n-1) e IC 95% de 10 repetições.
+% tempo medido: PETIC também varia entre repetições.
+\begin{table}[htb]
+    \centering
+    \small
+    \caption{Tempo total de decisão (s) na topologia GÉANT: média $\pm$ desvio-padrão amostral [IC 95\%]}
+    \label{tab:tempo-geant}
+    \begin{tabular}{llcc}
+        \hline
+        Nível (req.$\times$mult.) & Algoritmo & Média $\pm$ desvio & IC 95\% \\
+        \hline
+        l1 (10$\times$1,0) & PETIC & 0,0040 $\pm$ 0,0001 & [0,0039; 0,0041] \\
+         & ACO & 0,4350 $\pm$ 0,0144 & [0,4247; 0,4453] \\
+         & SA & 0,3757 $\pm$ 0,0357 & [0,3502; 0,4012] \\
+         & Q-Learning & 0,5074 $\pm$ 0,0128 & [0,4982; 0,5165] \\
+        \hline
+        l2 (20$\times$1,5) & PETIC & 0,0091 $\pm$ 0,0005 & [0,0088; 0,0094] \\
+         & ACO & 1,0213 $\pm$ 0,0233 & [1,0046; 1,0379] \\
+         & SA & 0,5024 $\pm$ 0,0255 & [0,4842; 0,5206] \\
+         & Q-Learning & 1,0811 $\pm$ 0,0133 & [1,0716; 1,0906] \\
+        \hline
+        l3 (40$\times$2,0) & PETIC & 0,0198 $\pm$ 0,0011 & [0,0191; 0,0206] \\
+         & ACO & 2,0932 $\pm$ 0,0715 & [2,0421; 2,1443] \\
+         & SA & 1,8942 $\pm$ 0,1639 & [1,7769; 2,0114] \\
+         & Q-Learning & 2,3111 $\pm$ 0,0702 & [2,2609; 2,3613] \\
+        \hline
+        l4 (60$\times$2,5) & PETIC & 0,0275 $\pm$ 0,0011 & [0,0267; 0,0283] \\
+         & ACO & 3,0969 $\pm$ 0,1772 & [2,9702; 3,2237] \\
+         & SA & 2,4551 $\pm$ 0,1292 & [2,3627; 2,5475] \\
+         & Q-Learning & 3,0421 $\pm$ 0,0862 & [2,9804; 3,1037] \\
+        \hline
+        l5 (80$\times$3,0) & PETIC & 0,0417 $\pm$ 0,0023 & [0,0400; 0,0433] \\
+         & ACO & 4,4498 $\pm$ 0,1628 & [4,3333; 4,5662] \\
+         & SA & 6,1539 $\pm$ 2,1499 & [4,6161; 7,6918] \\
+         & Q-Learning & 4,1847 $\pm$ 0,1567 & [4,0725; 4,2968] \\
+        \hline
+        l6 (80$\times$4,0) & PETIC & 0,0575 $\pm$ 0,0173 & [0,0451; 0,0698] \\
+         & ACO & 6,2630 $\pm$ 1,6026 & [5,1166; 7,4094] \\
+         & SA & 15,0707 $\pm$ 13,1634 & [5,6548; 24,4866] \\
+         & Q-Learning & 5,8228 $\pm$ 1,7691 & [4,5573; 7,0882] \\
+        \hline
+    \end{tabular}
+    \fonte{Elaborado pelo autor.}
+\end{table}
