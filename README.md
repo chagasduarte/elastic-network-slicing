@@ -6,13 +6,23 @@ Cada requisição conecta uma origem a um destino e define a banda necessária e
 
 ## Requisitos e execução
 
-- Python **3.10 ou superior**, por causa das anotações de tipo usadas no código.
-- Apenas a biblioteca padrão do Python; não há dependências externas para instalar.
+- Python **3.11** (versão usada para gerar os resultados da monografia; o código requer Python 3.10 ou superior).
+- A execução do simulador e a análise pareada usam apenas a biblioteca padrão. Para gerar gráficos e rodar toda a suíte de testes, instale as dependências de desenvolvimento: `matplotlib>=3.8` e `scipy>=1.11`, listadas em `requirements-dev.txt`.
 
-Na raiz do repositório, execute:
+Crie e prepare um ambiente virtual na raiz do repositório:
 
 ```bash
-python3 main.py
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+```
+
+No Windows com PowerShell, ative o ambiente com `.venv\Scripts\Activate.ps1`. Os comandos abaixo assumem que `.venv` está ativado.
+
+Para executar o cenário simples:
+
+```bash
+python main.py
 ```
 
 Para selecionar outro algoritmo e definir a semente:
@@ -26,16 +36,6 @@ python3 main.py --help
 ```
 
 O padrão continua sendo PETIC; a semente padrão é `42`. A semente controla os geradores locais de ACO, SA e Q-learning e não altera o PETIC, que é determinístico.
-
-Opcionalmente, crie um ambiente virtual antes de executar:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python main.py
-```
-
-No Windows com PowerShell, a ativação é feita com `.venv\Scripts\Activate.ps1`.
 
 ### Cenário padrão
 
@@ -291,19 +291,26 @@ A interface [SliceAllocator](contracts/slice_allocator.py) define o método `all
 
 ## Execução completa (matriz de experimentos)
 
+A matriz principal foi gerada com Python 3.11, semente-base `42` e a configuração versionada `experiments/configs/default.json` (30 cenários por célula; as sementes dos cenários são 42–71). A execução é sequencial e pode levar bastante tempo. A partir da raiz do repositório, o comando completo é:
+
 ```bash
-python3.11 -m experiments.run_all --config experiments/configs/default.json --dry-run   # lista sem rodar
-python3.11 -m experiments.run_all --config experiments/configs/default.json            # grava em results/<AAAAMMDD-HHMMSS>/
-python3.11 -m experiments.run_all --resume                                              # retoma a execução mais recente
-python3.11 -m experiments.run_all --estimar                                             # roda versão reduzida e extrapola o tempo
+python -m experiments.run_all --config experiments/configs/default.json --seed 42
 ```
+
+Ele grava uma nova pasta `results/<AAAAMMDD-HHMMSS>/`. Para validar o pipeline rapidamente, use a configuração pequena (uma topologia, três níveis e duas repetições):
+
+```bash
+python -m experiments.run_all --config experiments/configs/small.json --seed 42 --output-root /tmp/ens-small
+```
+
+Para inspecionar a matriz padrão sem executá-la, acrescente `--dry-run` ao comando principal. `--resume` retoma células concluídas a partir da configuração e das sementes registradas.
 
 Sobrescritas: `--topologies`, `--algorithms`, `--repetitions`, `--seed`, `--output-root`. A configuração padrão usa 30 cenários independentes por célula. Em cada cenário todos os algoritmos recebem as mesmas requisições, e a semente muda entre cenários. A execução é sequencial; cada célula (topologia, nível) é gravada atomicamente em `<topologia>/<nível>/` (`runs.json`, `runs.csv`, `aggregates.csv`, `celula.json`). Na raiz ficam `config_usada.json`, `metadados.json` (commit, árvore suja, Python, data/hora), `todas_execucoes.csv` (observações por cenário) e `todos_agregados.csv` (médias e intervalos calculados entre cenários).
 
 Após a matriz, rode os testes pareados de aceitação contra o PETIC e gere IC bootstrap, p-valores de Wilcoxon com ajuste de Holm e tamanho de efeito:
 
 ```bash
-python3.11 -m scripts.paired_analysis --run results/<AAAAMMDD-HHMMSS>
+python -m scripts.paired_analysis --run results/<AAAAMMDD-HHMMSS>
 ```
 
 O script escreve `analise_pareada_aceitacao.csv` na pasta da execução. A implementação independente da Forja pode ser executada para conferir o teste exato e Holm:
@@ -315,10 +322,10 @@ python3.11 -m scripts.verificacao_estatistica --run results/<AAAAMMDD-HHMMSS>
 Para gerar figuras PDF e tabelas LaTeX, incluindo tabelas de aceitação e banda por período:
 
 ```bash
-MPLCONFIGDIR=/tmp/matplotlib python3.11 -m scripts.plots --run results/<AAAAMMDD-HHMMSS>
+MPLCONFIGDIR="${TMPDIR:-/tmp}/matplotlib" python -m scripts.plots --run results/<AAAAMMDD-HHMMSS>
 ```
 
-Os parâmetros estatísticos usados estão documentados nos scripts e no capítulo de metodologia da monografia.
+O comando gera os PDFs vetoriais em `figuras/` e as tabelas LaTeX em `tabelas/` dentro da pasta da execução. Os parâmetros estatísticos estão documentados nos scripts e no capítulo de metodologia da monografia.
 
 ### Estimativa de tempo e sonda da grade
 
@@ -335,10 +342,10 @@ python3.11 -m experiments.run_all --estimar
 
 ## Testes
 
-Execute a suíte com a biblioteca padrão:
+Com o ambiente virtual ativado e as dependências instaladas, valide o projeto com:
 
 ```bash
-python3 -m unittest discover -s tests -v
+python -m unittest discover -s tests -v
 ```
 
 Os testes verificam o contrato do Q-learning, capacidade por período, rejeições, influência do resultado anterior e reprodução com semente fixa. Para executar os quatro algoritmos no mesmo cenário, use os comandos da seção de execução; cada processo cria um grafo novo.

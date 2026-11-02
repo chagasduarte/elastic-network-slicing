@@ -65,6 +65,13 @@ NOTA_TEMPO = (
 NOTA_ESTATISTICA = (
     "Barras: IC 95% entre cenários independentes (n={n}); algoritmos pareados por cenário."
 )
+LARGURA_FIGURA = 6.3
+ALTURA_PAINEL_TOPOLOGIA = 2.35
+
+
+def dimensoes_figura(quantidade_topologias: int) -> tuple[float, float]:
+    """Tamanho em polegadas para um painel vertical por topologia."""
+    return LARGURA_FIGURA, ALTURA_PAINEL_TOPOLOGIA * quantidade_topologias
 
 
 # ---------------------------------------------------------------- leitura
@@ -114,12 +121,13 @@ def _indice(linhas: list[dict]) -> dict:
 
 def figura_metrica(linhas: list[dict], niveis: list[dict], topologias: list[str],
                    base: str, ylabel: str, log: bool, destino: Path) -> None:
-    """Um painel com uma coluna por topologia; eixo x = nível de carga."""
+    """Painéis verticais por topologia para manter texto legível em A4."""
     idx = _indice(linhas)
     ns = [_num(l.get(f"{base}.count")) for l in linhas]
     n_cenarios = max((int(n) for n in ns if n is not None), default=0)
-    fig, eixos = plt.subplots(1, len(topologias), figsize=(6.5, 3.4), sharey=False, squeeze=False)
-    eixos = eixos[0]
+    fig, eixos = plt.subplots(len(topologias), 1, figsize=dimensoes_figura(len(topologias)),
+                              sharex=True, sharey=False, squeeze=False)
+    eixos = eixos[:, 0]
     n = len(ALGORITMOS)
     desloc = [(i - (n - 1) / 2) * 0.07 for i in range(n)]
     for ax, topo in zip(eixos, topologias):
@@ -138,24 +146,25 @@ def figura_metrica(linhas: list[dict], niveis: list[dict], topologias: list[str]
                 sem_barra = bi is None or bs is None or (bi == e["mean"] and bs == e["mean"])
                 lo.append(0.0 if sem_barra else max(e["mean"] - bi, 0.0))
                 hi.append(0.0 if sem_barra else max(bs - e["mean"], 0.0))
-            ax.errorbar(xs, ys, yerr=[lo, hi], label=NOMES_ALGORITMO[alg], markersize=4,
-                        linewidth=1.0, capsize=2, elinewidth=0.8, **ESTILOS[alg])
-        ax.set_title(NOMES_TOPOLOGIA.get(topo, topo), fontsize=9)
+            ax.errorbar(xs, ys, yerr=[lo, hi], label=NOMES_ALGORITMO[alg], markersize=5,
+                        linewidth=1.35, capsize=3, elinewidth=1.0, **ESTILOS[alg])
+        ax.set_title(NOMES_TOPOLOGIA.get(topo, topo), fontsize=12, pad=7)
         ax.set_xticks(range(len(niveis)))
-        ax.set_xticklabels([f"{nv['name']}\n{nv['requests']}\n×{formatar_numero(float(nv['multiplier']), 1)}"
-                            for nv in niveis], fontsize=5)
-        ax.set_xlabel("Nível (requisições, multiplicador)", fontsize=6)
-        ax.tick_params(axis="y", labelsize=7)
+        ax.set_xticklabels([f"{nv['name']}\n{nv['requests']} req.\n×{formatar_numero(float(nv['multiplier']), 1)}"
+                            for nv in niveis], fontsize=8.5)
+        ax.tick_params(axis="y", labelsize=9, pad=4)
+        ax.tick_params(axis="x", pad=5)
         if log:
             ax.set_yscale("log")
-        ax.grid(True, linewidth=0.3, alpha=0.6)
-    eixos[0].set_ylabel(ylabel, fontsize=8)
+        ax.grid(True, linewidth=0.55, alpha=0.55)
+    eixos[0].set_ylabel(ylabel, fontsize=10.5, labelpad=7)
     handles, rotulos = eixos[0].get_legend_handles_labels()
-    fig.legend(handles, rotulos, loc="lower center", ncol=n, fontsize=8, frameon=False,
-               bbox_to_anchor=(0.5, 0.035))
+    fig.supxlabel("Nível de carga (requisições e multiplicador)", fontsize=9.5, y=0.105)
+    fig.legend(handles, rotulos, loc="lower center", ncol=n, fontsize=9.5, frameon=False,
+               bbox_to_anchor=(0.5, 0.035), handlelength=2.2, columnspacing=1.6)
     nota = NOTA_TEMPO if log else NOTA_ESTATISTICA
-    fig.text(0.5, 0.012, nota.format(n=n_cenarios), ha="center", fontsize=5.5)
-    fig.tight_layout(rect=(0, 0.11, 1, 1))
+    fig.text(0.5, 0.009, nota.format(n=n_cenarios), ha="center", fontsize=8, wrap=True)
+    fig.tight_layout(rect=(0.02, 0.15, 0.99, 0.99), h_pad=1.35)
     destino.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(destino, format="pdf", metadata={"Creator": "scripts.plots", "Producer": "matplotlib",
                                                  "CreationDate": None, "ModDate": None})

@@ -55,6 +55,12 @@ class TestLeitura(unittest.TestCase):
 
 
 class TestSaidas(unittest.TestCase):
+    def test_figura_tem_paineis_verticais_com_altura_por_topologia(self):
+        largura, altura = plots.dimensoes_figura(3)
+        self.assertAlmostEqual(largura, 6.3)
+        self.assertAlmostEqual(altura, 7.05)
+        self.assertGreater(altura, largura)
+
     def test_figura_pdf(self):
         with tempfile.TemporaryDirectory() as d:
             destino = Path(d) / "f.pdf"
