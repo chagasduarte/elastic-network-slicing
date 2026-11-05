@@ -145,7 +145,7 @@ def comparar(run: Path, linhas):
     for l in linhas:
         o = outras.get((l["topology"], l["load_level"], l["algorithm"]))
         if o is None:
-            print("ausente na análise do Codex:", l["topology"], l["load_level"], l["algorithm"])
+            print("ausente na análise pareada de referência:", l["topology"], l["load_level"], l["algorithm"])
             continue
         max_media = max(max_media, abs(l["mean_difference_pp"] - float(o["mean_difference_pp"])))
         max_p = max(max_p, abs(l["wilcoxon_exact_p"] - float(o["wilcoxon_p"])))
@@ -156,7 +156,7 @@ def comparar(run: Path, linhas):
                                 l["wilcoxon_exact_holm"], float(o["wilcoxon_holm"])))
     print(f"{len(linhas)} comparações verificadas.")
     print(f"maior diferença absoluta na média (p.p.): {max_media:.2e}")
-    print(f"maior diferença absoluta no p bicaudal (Wilcoxon exato desta verificação x p da análise do Codex): {max_p:.3f}")
+    print(f"maior diferença absoluta no p bicaudal (Wilcoxon exato desta verificação x p da análise pareada de referência): {max_p:.3f}")
     print(f"divergências na decisão após Holm (alfa 0,05): {len(div_decisao)}")
     for d in div_decisao:
         print("  ", d)
