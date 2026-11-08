@@ -1,0 +1,45 @@
+% fonte: results/20261030-205754/todos_agregados.csv, colunas acceptance.acceptance_percent.mean, acceptance.acceptance_percent.stddev, acceptance.acceptance_percent.ci95_low, acceptance.acceptance_percent.ci95_high
+% escopo summary; unidade amostral: cenário independente; desvio-padrão amostral (n-1) e IC 95% entre cenários.
+% os algoritmos compartilham as requisições em cada cenário.
+\begin{table}[htb]
+    \centering
+    \small
+    \caption{Aceitação (\%) na topologia Abilene: média $\pm$ desvio-padrão amostral [IC 95\%]}
+    \label{tab:aceitacao-abilene}
+    \begin{tabular}{llcc}
+        \hline
+        Nível (req.$\times$mult.) & Algoritmo & Média $\pm$ desvio & IC 95\% \\
+        \hline
+        l1 (10$\times$1,0) & PETIC & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & ACO & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & SA & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & Q-Learning & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+        \hline
+        l2 (20$\times$1,5) & PETIC & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & ACO & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & SA & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & Q-Learning & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+        \hline
+        l3 (40$\times$2,0) & PETIC & 97,77 $\pm$ 1,80 & [97,10; 98,44] \\
+         & ACO & 97,77 $\pm$ 1,80 & [97,10; 98,44] \\
+         & SA & 97,90 $\pm$ 1,80 & [97,22; 98,57] \\
+         & Q-Learning & 97,77 $\pm$ 1,80 & [97,10; 98,44] \\
+        \hline
+        l4 (60$\times$2,5) & PETIC & 85,06 $\pm$ 2,50 & [84,12; 85,99] \\
+         & ACO & 85,10 $\pm$ 2,40 & [84,20; 85,99] \\
+         & SA & 85,04 $\pm$ 2,47 & [84,12; 85,96] \\
+         & Q-Learning & 85,01 $\pm$ 2,54 & [84,07; 85,96] \\
+        \hline
+        l5 (80$\times$3,0) & PETIC & 69,41 $\pm$ 2,30 & [68,55; 70,26] \\
+         & ACO & 69,50 $\pm$ 2,21 & [68,67; 70,33] \\
+         & SA & 69,08 $\pm$ 2,26 & [68,24; 69,93] \\
+         & Q-Learning & 69,47 $\pm$ 2,17 & [68,66; 70,28] \\
+        \hline
+        l6 (80$\times$4,0) & PETIC & 59,91 $\pm$ 2,55 & [58,95; 60,86] \\
+         & ACO & 59,96 $\pm$ 2,60 & [58,99; 60,93] \\
+         & SA & 59,29 $\pm$ 2,50 & [58,36; 60,22] \\
+         & Q-Learning & 60,06 $\pm$ 2,53 & [59,12; 61,01] \\
+        \hline
+    \end{tabular}
+    \fonte{Elaborado pelo autor.}
+\end{table}

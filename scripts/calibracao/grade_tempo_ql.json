@@ -1,0 +1,1 @@
+[["petic","petic",null],["q-learning","ep250",{"episodes":250}],["q-learning","ep500",{"episodes":500}],["q-learning","ep1000",{"episodes":1000}],["q-learning","ep2000_default",null],["q-learning","ep4000",{"episodes":4000}],["q-learning","ep1000_ed0.99",{"episodes":1000,"epsilon_decay":0.99}]]

@@ -1,0 +1,269 @@
+% =====================================================================
+% CAPÍTULO 3 — METODOLOGIA
+% ---------------------------------------------------------------------
+% Observações para o autor (apague antes de compilar a versão final):
+%  * Este arquivo assume que Metodologia passa a ser um capítulo próprio
+%    (\chapter), e não a seção 2.7 da Fundamentação Teórica.
+%  * Chaves de citação usadas que provavelmente JÁ existem no seu .bib
+%    (ajuste se os nomes forem diferentes): gomes2018, gomes2020,
+%    dorigo1999, kirkpatrick1983.
+%  * Chaves NOVAS (entradas em referencias_novas.bib): wazlawick2014,
+%    gil2008, watkins1992, orlowski2010, jain1984.
+%  * Trechos marcados com [PENDENTE: ...] dependem de decisões do
+%    experimento que ainda não estão no código (ver revisão do código).
+%  * \fonte{} é o comando do abnTeX2 para a fonte de tabelas/figuras.
+% =====================================================================
+
+\chapter{METODOLOGIA}
+\label{cap:metodologia}
+
+A metodologia deste trabalho consiste na modelagem, implementação e avaliação de diferentes estratégias para a alocação dinâmica de recursos destinados à formação de fatias de rede em ambientes de demanda elástica. Para isso, são implementadas e comparadas quatro abordagens com diferentes paradigmas de decisão e otimização: o algoritmo guloso e determinístico PETIC, a meta-heurística populacional \textit{Ant Colony Optimization} (ACO), a meta-heurística de trajetória \textit{Simulated Annealing} (SA) e o método de aprendizado por reforço \textit{Q-Learning}. As estratégias são submetidas aos mesmos cenários de rede e de demanda, o que permite avaliar seu comportamento a partir de métricas relacionadas à qualidade das alocações, à utilização dos recursos disponíveis e ao custo computacional das decisões.
+
+Este capítulo descreve a caracterização da pesquisa, as etapas seguidas, o ambiente de simulação desenvolvido, o modelo formal adotado para a rede e para as demandas, a forma como cada estratégia foi implementada, as topologias utilizadas, as métricas de avaliação e o procedimento experimental.
+
+% ---------------------------------------------------------------------
+\section{CARACTERIZAÇÃO DA PESQUISA}
+\label{sec:caracterizacao}
+
+Quanto à sua natureza, esta pesquisa classifica-se como aplicada, pois busca gerar conhecimento voltado a um problema concreto: a escolha de estratégias de alocação de recursos para fatias de rede em infraestruturas compartilhadas por provedores de serviço \cite{gil2008}. Quanto à abordagem do problema, a pesquisa é quantitativa, uma vez que as estratégias são comparadas por meio de métricas numéricas obtidas a partir de execuções controladas.
+
+Quanto aos objetivos, a pesquisa possui caráter exploratório e descritivo. É exploratória porque investiga o comportamento de algoritmos de paradigmas distintos em um mesmo problema, buscando identificar padrões e condições nas quais cada abordagem se destaca; e descritiva porque registra e caracteriza o desempenho observado de cada estratégia segundo um conjunto definido de métricas \cite{gil2008}.
+
+Quanto aos procedimentos técnicos, trata-se de uma pesquisa experimental baseada em simulação computacional. Segundo \citeonline{wazlawick2014}, a pesquisa experimental em Ciência da Computação caracteriza-se pela manipulação controlada de variáveis independentes e pela observação de seus efeitos sobre variáveis dependentes. Neste trabalho, as variáveis independentes são o algoritmo de alocação, a topologia de rede e o cenário de demanda, enquanto as variáveis dependentes correspondem às métricas de desempenho descritas na Seção~\ref{sec:metricas}. Os demais fatores, como a capacidade dos enlaces, a ordem de processamento das requisições e as sementes dos geradores pseudoaleatórios, são mantidos sob controle para que as diferenças observadas possam ser atribuídas às estratégias avaliadas.
+
+% ---------------------------------------------------------------------
+\section{ETAPAS DA PESQUISA}
+\label{sec:etapas}
+
+O desenvolvimento do trabalho foi organizado nas seguintes etapas:
+
+\begin{enumerate}
+    \item \textbf{Revisão bibliográfica:} estudo dos conceitos de virtualização de redes, SDN, NFV, fatiamento de redes e demanda elástica, bem como dos algoritmos selecionados, apresentados no Capítulo~\ref{cap:fundamentacao}. % ajuste o label do cap. 2
+    \item \textbf{Modelagem do problema:} formalização da rede física, das requisições de fatias e das restrições de capacidade, de modo que todas as estratégias operem sobre a mesma representação (Seção~\ref{sec:modelo}).
+    \item \textbf{Implementação do simulador:} desenvolvimento de um ambiente de simulação com contrato comum para os alocadores, serviço de reserva de banda e módulo de coleta de métricas (Seção~\ref{sec:ambiente}).
+    \item \textbf{Implementação das estratégias:} adaptação do PETIC, do ACO, do SA e do Q-Learning ao problema modelado (Seção~\ref{sec:estrategias}).
+    \item \textbf{Verificação:} construção de testes automatizados para validar o comportamento de cada alocador e das métricas em cenários conhecidos.
+    \item \textbf{Execução dos experimentos:} submissão das estratégias aos mesmos cenários, com repetições independentes (Seção~\ref{sec:procedimento}).
+    \item \textbf{Análise dos resultados:} agregação estatística e comparação das métricas obtidas, apresentadas no Capítulo~\ref{cap:resultados}. % ajuste o label
+\end{enumerate}
+
+% ---------------------------------------------------------------------
+\section{AMBIENTE DE SIMULAÇÃO}
+\label{sec:ambiente}
+
+Para a realização dos experimentos foi desenvolvido um simulador próprio na linguagem Python, versão 3.10, utilizando exclusivamente a biblioteca padrão da linguagem. A opção por um simulador próprio, em vez de emuladores de rede, deve-se ao foco do trabalho na etapa de decisão da alocação, isto é, na escolha dos recursos que compõem cada fatia, e não no encaminhamento de pacotes no plano de dados.
+
+O simulador foi organizado em componentes com responsabilidades separadas. A camada de domínio representa nós, enlaces, requisições, demandas e resultados de alocação. Todas as estratégias implementam um mesmo contrato de alocação, que recebe o grafo da rede, a requisição, a demanda do período corrente e, opcionalmente, o resultado obtido para a mesma requisição no período anterior, retornando um caminho e a indicação de aceitação ou rejeição. A reserva efetiva da banda nos enlaces é realizada por um serviço independente, chamado apenas após a decisão do algoritmo, que valida novamente a capacidade de cada enlace do caminho antes de registrar a alocação.
+
+Essa separação entre decisão e reserva garante que nenhuma estratégia altere o estado da rede durante sua busca e que todas sejam submetidas às mesmas regras de validação. Além disso, um módulo de métricas registra cada decisão e captura o estado da rede ao final de cada período, sem interferir no processo de alocação.
+
+% ---------------------------------------------------------------------
+\section{MODELAGEM DO PROBLEMA}
+\label{sec:modelo}
+
+A infraestrutura física é representada por um grafo não direcionado $G = (V, E)$, em que $V$ é o conjunto de nós e $E$ o conjunto de enlaces. Cada enlace $e \in E$ possui uma capacidade $c_e$, expressa em Mbps, compartilhada entre os dois sentidos de transmissão.
+
+O tempo é discretizado em um conjunto ordenado de períodos $T = \{t_1, t_2, \ldots, t_n\}$, que representam diferentes momentos do dia. Uma requisição de fatia $r \in R$ é definida por um nó de origem $s_r$, um nó de destino $d_r$ e uma sequência de demandas de largura de banda $b_r^t$, uma para cada período $t$. A variação de $b_r^t$ ao longo de $T$ caracteriza o comportamento de demanda elástica discutido na Seção~\ref{sec:demanda-elastica}. % ajuste o label da seção 2.5
+
+Para cada requisição e período, a estratégia de alocação deve encontrar um caminho simples $P_r^t$ entre $s_r$ e $d_r$, no qual cada enlace possua banda disponível suficiente para a demanda. A banda disponível de um enlace $e$ no período $t$ é dada pela Equação~\ref{eq:banda-disponivel}:
+
+\begin{equation}
+    a_e^t = c_e - \sum_{r \in R \,:\, e \in P_r^t} b_r^t
+    \label{eq:banda-disponivel}
+\end{equation}
+
+\noindent e a restrição de capacidade exige que $a_e^t \geq b_r^t$ para todo $e \in P_r^t$ no momento da alocação. As reservas são contabilizadas separadamente por período: a banda reservada em $t_1$ não consome a capacidade disponível em $t_2$, pois cada período representa um estado independente da ocupação da rede. Quando não existe caminho viável, a demanda daquele período é rejeitada.
+
+As demandas são processadas em ordem cronológica dos períodos e, dentro de cada período, em uma ordem fixa de requisições, idêntica para todas as estratégias. Ao alocar a demanda de $r$ no período $t_k$, o algoritmo recebe o caminho $P_r^{t_{k-1}}$ obtido no período anterior, o que permite que estratégias favoreçam a manutenção da fatia e evitem reconfigurações desnecessárias.
+
+% ---------------------------------------------------------------------
+\section{IMPLEMENTAÇÃO DAS ESTRATÉGIAS}
+\label{sec:estrategias}
+
+Esta seção descreve como cada estratégia apresentada no Capítulo~\ref{cap:fundamentacao} foi adaptada ao modelo da Seção~\ref{sec:modelo}. Em todas elas, enlaces sem banda disponível suficiente para a demanda corrente são desconsiderados durante a busca.
+
+\subsection{PETIC}
+\label{subsec:impl-petic}
+
+O PETIC foi implementado conforme a proposta de \citeonline{gomes2018}, utilizando o algoritmo de Dijkstra para encontrar o caminho de menor custo entre origem e destino. O peso de cada enlace viável é calculado pela Equação~\ref{eq:peso-petic}:
+
+\begin{equation}
+    w_e = \exp\!\left(\frac{b_r^t}{a_e^t}\right)
+    \label{eq:peso-petic}
+\end{equation}
+
+\noindent de modo que enlaces com maior banda disponível em relação à demanda recebem pesos menores, favorecendo a distribuição da carga e evitando a saturação. Enlaces com $a_e^t < b_r^t$ recebem peso infinito e são, na prática, removidos do grafo.
+
+Para favorecer a reutilização da fatia, quando a demanda do período anterior foi aceita e a demanda atual não supera a banda anteriormente alocada ($b_r^{t} \leq b_r^{t-1}$), os enlaces viáveis do caminho anterior recebem um peso reduzido $\varepsilon = 10^{-4}$. Assim, se o caminho anterior continua apto a atender à nova demanda, ele tende a ser mantido. O PETIC é determinístico: para uma mesma entrada, produz sempre a mesma saída.
+
+\subsection{Ant Colony Optimization}
+\label{subsec:impl-aco}
+
+Na adaptação do ACO, cada formiga constrói um caminho partindo da origem e escolhendo, a cada passo, um enlace viável que leve a um nó ainda não visitado. A probabilidade de a formiga, no nó $i$, seguir pelo enlace $(i, j)$ é dada pela Equação~\ref{eq:prob-aco} \cite{dorigo1999}:
+
+\begin{equation}
+    p_{ij} = \frac{\tau_{ij}^{\alpha} \, \eta_{ij}^{\beta}}{\sum_{k \in N_i} \tau_{ik}^{\alpha} \, \eta_{ik}^{\beta}}
+    \label{eq:prob-aco}
+\end{equation}
+
+\noindent em que $\tau_{ij}$ é o feromônio do enlace, $N_i$ é o conjunto de vizinhos viáveis e não visitados de $i$, e $\eta_{ij} = a_{ij}^t / b_r^t$ é a informação heurística, que favorece enlaces com maior folga de banda. Uma formiga que atinge um nó sem vizinhos viáveis é descartada naquela iteração.
+
+O custo de um caminho completo $P$ é calculado com a mesma função exponencial do PETIC, $C(P) = \sum_{e \in P} w_e$. Ao final de cada iteração, todos os feromônios evaporam segundo $\tau_{ij} \leftarrow (1 - \rho)\,\tau_{ij}$ e, em seguida, cada formiga que concluiu um caminho deposita $Q / C(P)$ em cada enlace utilizado. O melhor caminho encontrado em todas as iterações é retornado como solução. Os feromônios são reiniciados a cada alocação, e o resultado do período anterior não é utilizado por essa estratégia.
+
+\subsection{Simulated Annealing}
+\label{subsec:impl-sa}
+
+O SA parte de uma solução inicial viável obtida pelo algoritmo de Dijkstra com custo unitário por enlace, ou seja, o caminho viável com menor número de saltos. A cada iteração, uma solução vizinha é gerada escolhendo aleatoriamente um nó pivô do caminho atual e reconstruindo o trecho entre o pivô e o destino por meio de uma busca em profundidade com ordem aleatória de vizinhos, limitada a um número máximo de passos e restrita a enlaces viáveis.
+
+A qualidade de um caminho $P$ é avaliada pela função de custo da Equação~\ref{eq:custo-sa}:
+
+\begin{equation}
+    f(P) = \omega_h \frac{|P|}{|V| - 1} + \omega_u \, \bar{u}(P) + \omega_g \, u_{\max}(P) + \omega_m \left(1 - J(P, P^{t-1})\right)
+    \label{eq:custo-sa}
+\end{equation}
+
+\noindent em que $|P|$ é o número de saltos, $\bar{u}(P)$ e $u_{\max}(P)$ são, respectivamente, a utilização média e a máxima dos enlaces do caminho considerando a inclusão da demanda corrente, e $J(P, P^{t-1})$ é o índice de Jaccard entre os conjuntos de enlaces do caminho candidato e do caminho do período anterior. O último termo penaliza, portanto, mudanças em relação à fatia já estabelecida. Os pesos utilizados foram $\omega_h = 0{,}20$, $\omega_u = 0{,}30$, $\omega_g = 0{,}35$ e $\omega_m = 0{,}15$.
+
+Uma solução vizinha de menor custo é sempre aceita; uma de maior custo é aceita com probabilidade $e^{-\Delta/T}$, conforme o critério de Metropolis \cite{kirkpatrick1983}. A temperatura é reduzida geometricamente a cada iteração, $T \leftarrow \lambda T$, e o processo termina quando $T$ atinge a temperatura mínima ou quando o número máximo de iterações é alcançado. Com os parâmetros da Tabela~\ref{tab:parametros}, o critério de temperatura encerra a busca após 108 iterações, antes do limite de 500.
+
+\subsection{Q-Learning}
+\label{subsec:impl-qlearning}
+
+Na adaptação do Q-Learning, o problema de encontrar o caminho de uma fatia foi modelado como um processo de decisão de Markov em que o \textbf{estado} é o nó em que o agente se encontra e cada \textbf{ação} corresponde à escolha de um nó vizinho alcançável por um enlace viável. Cada episódio inicia na origem $s_r$ e termina quando o agente alcança o destino $d_r$ ou quando atinge o limite de $4|V|$ passos.
+
+A \textbf{recompensa} de uma ação é o negativo do custo do enlace percorrido, calculado pela mesma função exponencial do PETIC (Equação~\ref{eq:peso-petic}), acrescido de uma penalidade de $0{,}15$ quando o enlace não pertence ao caminho do período anterior. Dessa forma, maximizar a recompensa acumulada equivale a minimizar o custo do caminho, favorecendo a continuidade da fatia. Os valores $Q(s,a)$ são atualizados pela regra da Equação~\ref{eq:qlearning} \cite{watkins1992}, % ajuste para o label da equação 2.1
+e a seleção de ações segue a política $\epsilon$-gulosa, com $\epsilon$ decaindo multiplicativamente a cada episódio até um valor mínimo.
+
+A tabela Q é reiniciada a cada alocação, já que a ocupação dos enlaces, a demanda e o caminho anterior mudam entre períodos. Ao final do treinamento, o caminho extraído da política gulosa é comparado ao melhor caminho sem ciclos obtido nos episódios que alcançaram o destino, e o de menor custo é retornado. Caso nenhum episódio alcance o destino, a demanda é rejeitada; não há busca auxiliar por outro algoritmo de roteamento.
+
+\subsection{Parâmetros}
+\label{subsec:parametros}
+
+A Tabela~\ref{tab:parametros} resume os parâmetros utilizados por cada estratégia.
+
+\begin{table}[htb]
+    \centering
+    \caption{Parâmetros das estratégias avaliadas}
+    \label{tab:parametros}
+    \begin{tabular}{llr}
+        \hline
+        \textbf{Estratégia} & \textbf{Parâmetro} & \textbf{Valor} \\
+        \hline
+        PETIC & Peso de reutilização ($\varepsilon$) & $10^{-4}$ \\
+        \hline
+        ACO & Número de formigas & 10 \\
+            & Número de iterações & 20 \\
+            & Influência do feromônio ($\alpha$) & 1,0 \\
+            & Influência da heurística ($\beta$) & 1,0 \\
+            & Taxa de evaporação ($\rho$) & 0,1 \\
+            & Feromônio inicial ($\tau_0$) & 1,0 \\
+            & Constante de depósito ($Q$) & 1,0 \\
+        \hline
+        SA & Temperatura inicial & 0,25 \\
+           & Temperatura mínima & 0,001 \\
+           & Fator de resfriamento ($\lambda$) & 0,95 \\
+           & Máximo de iterações & 500 \\
+           & Tentativas para gerar vizinho & 30 \\
+           & Máximo de passos na reconstrução & 20 \\
+           & Pesos $\omega_h$, $\omega_u$, $\omega_g$, $\omega_m$ & 0,20; 0,30; 0,35; 0,15 \\
+        \hline
+        Q-Learning & Episódios por alocação & 2000 \\
+                   & Taxa de aprendizado ($\alpha$) & 0,2 \\
+                   & Fator de desconto ($\gamma$) & 1,0 \\
+                   & $\epsilon$ inicial / mínimo & 1,0 / 0,05 \\
+                   & Decaimento de $\epsilon$ & 0,995 \\
+                   & Máximo de passos por episódio & $4|V|$ \\
+                   & Penalidade por mudança de enlace & 0,15 \\
+        \hline
+    \end{tabular}
+    \fonte{Elaborado pelo autor.}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{TOPOLOGIAS}
+\label{sec:topologias}
+
+Os experimentos utilizam topologias de redes reais cuja conectividade foi obtida da biblioteca SNDlib \cite{orlowski2010}, amplamente empregada na avaliação de problemas de projeto e otimização de redes. Os nós foram renomeados com identificadores alfabéticos para padronizar os cenários, mantendo-se o registro da localidade correspondente a cada identificador. A Tabela~\ref{tab:topologias} apresenta as características das topologias.
+
+\begin{table}[htb]
+    \centering
+    \caption{Topologias utilizadas nos experimentos}
+    \label{tab:topologias}
+    \begin{tabular}{lrrr}
+        \hline
+        \textbf{Topologia} & \textbf{Nós} & \textbf{Enlaces} & \textbf{Capacidade por enlace (Mbps)} \\
+        \hline
+        Abilene        & 12 & 15 & [PENDENTE] \\
+        Nobel-Germany  & 17 & 26 & [PENDENTE] \\
+        GÉANT          & 22 & 36 & [PENDENTE] \\
+        Germany50      & 50 & 88 & [PENDENTE] \\
+        \hline
+    \end{tabular}
+    \fonte{Adaptado de \citeonline{orlowski2010}.}
+\end{table}
+
+% [PENDENTE] Hoje as capacidades padrão do código são muito diferentes
+% entre as topologias (Abilene 9920, GÉANT 40000, Nobel/Germany50 800).
+% Com demandas de dezenas de Mbps, Abilene e GÉANT nunca saturam.
+% Recomendo usar a MESMA capacidade em todas (ex.: 800 Mbps), e então
+% escrever o parágrafo abaixo:
+As capacidades originais das instâncias não foram utilizadas diretamente. Para tornar os cenários comparáveis entre si e permitir que a rede alcance níveis de ocupação nos quais as estratégias se diferenciem, todos os enlaces receberam a mesma capacidade de [PENDENTE: valor] Mbps.
+
+% ---------------------------------------------------------------------
+\section{CENÁRIOS DE DEMANDA}
+\label{sec:cenarios}
+
+% [PENDENTE] Esta seção descreve o desenho PROPOSTO na revisão do código.
+% O simulador hoje executa uma única requisição; com uma requisição só,
+% cada período começa com a rede vazia e todos os algoritmos aceitam
+% 100% das demandas. Ajuste os valores depois de implementar.
+Para reproduzir o comportamento de demanda elástica, cada cenário é composto por um conjunto de $|R| = $ [PENDENTE] requisições simultâneas, cujos pares de origem e destino são sorteados uniformemente entre os nós da topologia, sem repetição de pares. Cada requisição possui demandas em $|T| = $ [PENDENTE] períodos, que representam diferentes momentos do dia, de forma análoga à Figura~\ref{fig:variacao-demanda}. % ajuste o label da Figura 1
+
+A demanda de cada requisição em cada período é gerada a partir de um perfil diário de carga multiplicado por uma variação aleatória individual, de modo que as requisições acompanham a tendência geral de aumento e redução da utilização, mas não de forma idêntica. [PENDENTE: descrever o perfil, ex.: períodos de baixa, média e alta demanda, e o intervalo de banda em Mbps.]
+
+Para avaliar o comportamento das estratégias sob diferentes condições de utilização, a carga é variada em [PENDENTE] níveis, por meio do número de requisições ou de um fator multiplicador das demandas, abrangendo desde cenários de baixa ocupação, em que espera-se que todas as estratégias aceitem as demandas, até cenários próximos da saturação, nos quais as diferenças entre as decisões de cada algoritmo se tornam relevantes. Todos os cenários são gerados a partir de sementes fixas e são idênticos para todas as estratégias.
+
+% ---------------------------------------------------------------------
+\section{MÉTRICAS DE AVALIAÇÃO}
+\label{sec:metricas}
+
+As estratégias são comparadas por meio das métricas a seguir, calculadas para cada período e para o experimento completo. Seja $D$ o conjunto de pares requisição--período processados e $D_a \subseteq D$ o subconjunto de demandas aceitas.
+
+\textbf{Taxa de aceitação:} proporção de demandas atendidas, Equação~\ref{eq:aceitacao}. Mede a capacidade da estratégia de encontrar caminhos viáveis à medida que a rede é ocupada.
+
+\begin{equation}
+    \text{TA} = \frac{|D_a|}{|D|} \times 100\%
+    \label{eq:aceitacao}
+\end{equation}
+
+\textbf{Banda atendida:} razão entre a banda efetivamente reservada e a banda solicitada, Equação~\ref{eq:banda-atendida}. Diferentemente da taxa de aceitação, pondera cada demanda pelo seu tamanho, revelando se uma estratégia tende a rejeitar principalmente demandas maiores.
+
+\begin{equation}
+    \text{BA} = \frac{\sum_{(r,t) \in D_a} b_r^t}{\sum_{(r,t) \in D} b_r^t} \times 100\%
+    \label{eq:banda-atendida}
+\end{equation}
+
+\textbf{Utilização dos enlaces:} para cada enlace e período, a utilização é $u_e^t = (c_e - a_e^t) / c_e$. São reportadas a utilização média, a utilização máxima e a quantidade de enlaces saturados, isto é, com $u_e^t = 1$.
+
+\textbf{Índice de Jain:} mede o equilíbrio da distribuição da carga entre os enlaces, Equação~\ref{eq:jain} \cite{jain1984}. O índice varia entre $1/|E|$, quando toda a carga se concentra em um único enlace, e $1$, quando todos os enlaces possuem a mesma utilização. Valores maiores indicam que a estratégia espalha melhor a carga pela rede.
+
+\begin{equation}
+    J = \frac{\left(\sum_{e \in E} u_e^t\right)^2}{|E| \sum_{e \in E} \left(u_e^t\right)^2}
+    \label{eq:jain}
+\end{equation}
+
+\textbf{Comprimento dos caminhos:} número médio de saltos dos caminhos aceitos. Caminhos mais longos consomem banda em mais enlaces para atender a mesma demanda.
+
+\textbf{Taxa de reutilização:} proporção de transições entre períodos consecutivos em que uma requisição aceita nos dois períodos manteve exatamente o mesmo caminho. Mede a estabilidade das fatias, já que cada mudança de caminho implica reconfiguração da rede.
+
+\textbf{Tempo de decisão:} tempo de execução do método de alocação, medido com relógio de alta resolução e restrito à chamada do algoritmo, sem incluir a reserva de banda, a coleta de métricas ou a exportação dos resultados. Representa o custo computacional de cada estratégia. Como todas as estratégias compartilham a mesma estrutura de dados do grafo, os valores são comparáveis entre si, mas refletem esta implementação específica e não devem ser interpretados como medidas absolutas.
+
+% ---------------------------------------------------------------------
+\section{PROCEDIMENTO EXPERIMENTAL}
+\label{sec:procedimento}
+
+Cada combinação de topologia, cenário de demanda e estratégia é executada [PENDENTE: número] vezes. Em cada execução, o grafo, as requisições e o alocador são criados novamente a partir de cópias independentes, garantindo que nenhuma reserva ou estado interno de uma execução influencie a seguinte. Para as estratégias estocásticas (ACO, SA e Q-Learning), cada repetição $k$ utiliza a semente $42 + k$ no gerador pseudoaleatório do próprio algoritmo, o que torna os experimentos reprodutíveis. O PETIC, por ser determinístico, produz o mesmo resultado em todas as repetições e é executado novamente apenas para a medição do tempo. A ordem de execução das estratégias é rotacionada a cada repetição, reduzindo a influência de efeitos do ambiente de execução sobre as medições de tempo.
+
+Ao final de cada período, o estado de todos os enlaces da rede é registrado, incluindo os enlaces ociosos, para o cálculo das métricas de utilização. Os resultados de cada execução são exportados em formato CSV e JSON e, em seguida, agregados por estratégia, topologia, cenário e período, sendo apresentados por meio da média, do desvio-padrão e do intervalo de confiança de 95\%. % [PENDENTE] o código hoje calcula desvio-padrão populacional e não calcula IC.
+
+Os experimentos foram executados em um computador com [PENDENTE: processador], [PENDENTE: memória] e sistema operacional [PENDENTE], utilizando Python 3.10.

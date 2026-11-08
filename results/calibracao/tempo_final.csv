@@ -1,0 +1,6 @@
+algorithm,label,parameters,allocations,mean_ms,median_ms,p95_ms
+petic,petic,{},1680,0.075,0.061,0.159
+q-learning,ql_default,{},1680,11.347,10.612,28.286
+aco,aco_10x20_final,{},1680,9.948,7.407,26.581
+sa,sa_antes_108it,"{""cooling_rate"": 0.95, ""max_iterations"": 500}",1680,11.144,5.05,33.958
+sa,sa_depois_200it,{},1680,21.138,8.739,51.102

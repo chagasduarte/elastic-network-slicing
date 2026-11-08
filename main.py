@@ -1,4 +1,6 @@
 import argparse
+from dataclasses import asdict
+import inspect
 import random
 
 from algorithms.aco.aco_allocator import AcoAllocator
@@ -24,12 +26,45 @@ from pathfinding.dijkstra_path_finder import DijkstraPathFinder
 from services.bandwidth_reservation_service import BandwidthReservationService
 
 
+def allocator_parameters(
+    algorithm: str,
+    overrides: dict | None = None,
+) -> dict:
+    """Parâmetros efetivos, derivados dos próprios construtores/configurações."""
+    overrides = {} if overrides is None else dict(overrides)
+    if algorithm == "petic":
+        if overrides:
+            raise ValueError("PETIC não expõe parâmetros configuráveis no construtor.")
+        return {
+            "path_finder": "DijkstraPathFinder",
+            "reuse_weight": PeticAllocator.EPSILON,
+        }
+    if algorithm == "aco":
+        defaults = {
+            name: parameter.default
+            for name, parameter in inspect.signature(AcoAllocator).parameters.items()
+            if name != "seed"
+        }
+        unknown = set(overrides) - defaults.keys()
+        if unknown:
+            raise ValueError(f"Parâmetros ACO desconhecidos: {sorted(unknown)}")
+        return {**defaults, **overrides}
+    if algorithm == "sa":
+        return asdict(SimulatedAnnealingConfig(**overrides))
+    if algorithm == "q-learning":
+        return asdict(QLearningConfig(**overrides))
+    raise ValueError(f"Algoritmo desconhecido: {algorithm}")
+
+
 def create_allocator(
     algorithm: str,
     reservation_service: BandwidthReservationService,
-    seed: int = 42,
+    seed: int | None = 42,
+    *,
+    parameters: dict | None = None,
 ) -> SliceAllocator:
     """Constrói o alocador mantendo o mesmo contrato entre os algoritmos."""
+    effective_parameters = allocator_parameters(algorithm, parameters)
     if algorithm == "petic":
         return PeticAllocator(
             path_finder=DijkstraPathFinder(),
@@ -37,10 +72,10 @@ def create_allocator(
         )
 
     if algorithm == "aco":
-        return AcoAllocator(seed=seed)
+        return AcoAllocator(seed=seed, **effective_parameters)
 
     if algorithm == "sa":
-        config = SimulatedAnnealingConfig()
+        config = SimulatedAnnealingConfig(**effective_parameters)
         random_generator = random.Random(seed)
         return SimulatedAnnealingAllocator(
             path_finder=DijkstraPathFinder(),
@@ -55,7 +90,9 @@ def create_allocator(
         )
 
     if algorithm == "q-learning":
-        return QLearningAllocator(config=QLearningConfig(), seed=seed)
+        return QLearningAllocator(
+            config=QLearningConfig(**effective_parameters), seed=seed
+        )
 
     raise ValueError(f"Algoritmo desconhecido: {algorithm}")
 
@@ -127,4 +164,4 @@ if __name__ == "__main__":
         help="Semente dos algoritmos estocásticos (padrão: 42).",
     )
     args = parser.parse_args()
-    main(algorithm="aco", seed=args.seed)
+    main(algorithm=args.algorithm, seed=args.seed)

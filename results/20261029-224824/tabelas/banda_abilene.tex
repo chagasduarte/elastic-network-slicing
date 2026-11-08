@@ -1,0 +1,45 @@
+% fonte: results/20261029-224824/todos_agregados.csv, colunas bandwidth.served_percent.mean, bandwidth.served_percent.stddev, bandwidth.served_percent.ci95_low, bandwidth.served_percent.ci95_high
+% escopo summary; desvio-padrão amostral (n-1) e IC 95% de 10 repetições.
+% PETIC é determinístico (desvio e IC nulos); o IC reflete só a aleatoriedade dos estocásticos.
+\begin{table}[htb]
+    \centering
+    \small
+    \caption{Banda atendida (\%) na topologia Abilene: média $\pm$ desvio-padrão amostral [IC 95\%]}
+    \label{tab:banda-abilene}
+    \begin{tabular}{llcc}
+        \hline
+        Nível (req.$\times$mult.) & Algoritmo & Média $\pm$ desvio & IC 95\% \\
+        \hline
+        l1 (10$\times$1,0) & PETIC & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & ACO & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & SA & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & Q-Learning & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+        \hline
+        l2 (20$\times$1,5) & PETIC & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & ACO & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & SA & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+         & Q-Learning & 100,00 $\pm$ 0,00 & [100,00; 100,00] \\
+        \hline
+        l3 (40$\times$2,0) & PETIC & 95,48 $\pm$ 0,00 & [95,48; 95,48] \\
+         & ACO & 95,48 $\pm$ 0,00 & [95,48; 95,48] \\
+         & SA & 95,48 $\pm$ 0,00 & [95,48; 95,48] \\
+         & Q-Learning & 95,48 $\pm$ 0,00 & [95,48; 95,48] \\
+        \hline
+        l4 (60$\times$2,5) & PETIC & 79,66 $\pm$ 0,00 & [79,66; 79,66] \\
+         & ACO & 79,71 $\pm$ 0,16 & [79,59; 79,83] \\
+         & SA & 79,22 $\pm$ 0,00 & [79,22; 79,22] \\
+         & Q-Learning & 79,66 $\pm$ 0,00 & [79,66; 79,66] \\
+        \hline
+        l5 (80$\times$3,0) & PETIC & 61,37 $\pm$ 0,00 & [61,37; 61,37] \\
+         & ACO & 61,83 $\pm$ 0,45 & [61,51; 62,15] \\
+         & SA & 61,23 $\pm$ 0,08 & [61,18; 61,29] \\
+         & Q-Learning & 61,82 $\pm$ 0,00 & [61,82; 61,82] \\
+        \hline
+        l6 (80$\times$4,0) & PETIC & 47,56 $\pm$ 0,00 & [47,56; 47,56] \\
+         & ACO & 47,47 $\pm$ 0,44 & [47,15; 47,78] \\
+         & SA & 45,47 $\pm$ 0,17 & [45,35; 45,59] \\
+         & Q-Learning & 47,98 $\pm$ 0,00 & [47,98; 47,98] \\
+        \hline
+    \end{tabular}
+    \fonte{Elaborado pelo autor.}
+\end{table}

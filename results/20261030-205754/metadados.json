@@ -1,0 +1,140 @@
+{
+  "data_hora": "2026-10-30T20:57:54",
+  "python": "3.11.16 (main, Sep  1 2026, 14:08:36) [Clang 22.1.3 ]",
+  "plataforma": "macOS-26.7.1-x86_64-i386-64bit",
+  "git": {
+    "commit": "a6d0332755e63a43728d5cc10610da8f715e28e8",
+    "arvore_suja": true,
+    "arquivos_modificados": [
+      "?? scripts/diagnostico_sa_germany50.py"
+    ]
+  },
+  "config": "experiments/configs/default.json",
+  "seed": 42,
+  "sobrescritas": {
+    "topologias": null,
+    "algoritmos": null,
+    "repeticoes": null,
+    "seed": null
+  },
+  "algoritmos": [
+    "petic",
+    "aco",
+    "sa",
+    "q-learning"
+  ],
+  "modo": "completo",
+  "celulas": [
+    {
+      "topology": "abilene",
+      "load_level": "l1",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l2",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l3",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l4",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l5",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l6",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l1",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l2",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l3",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l4",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l5",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l6",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "geant",
+      "load_level": "l1",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "geant",
+      "load_level": "l2",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "geant",
+      "load_level": "l3",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "geant",
+      "load_level": "l4",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "geant",
+      "load_level": "l5",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    },
+    {
+      "topology": "geant",
+      "load_level": "l6",
+      "repetitions": 30,
+      "unit": "independent_scenario"
+    }
+  ],
+  "duracao_segundos": 3772.762184534,
+  "celulas_executadas": 18,
+  "celulas_puladas": 0
+}

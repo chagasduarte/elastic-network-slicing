@@ -1,0 +1,120 @@
+{
+  "data_hora": "2026-10-29T22:48:24",
+  "python": "3.11.16 (main, Sep  1 2026, 14:08:36) [Clang 22.1.3 ]",
+  "plataforma": "macOS-26.7.1-x86_64-i386-64bit",
+  "git": {
+    "commit": "d61273ceb57a7045a50e118052f5cfe65e64fc74",
+    "arvore_suja": false,
+    "arquivos_modificados": []
+  },
+  "config": "experiments/configs/default.json",
+  "seed": 42,
+  "sobrescritas": {
+    "topologias": null,
+    "algoritmos": null,
+    "repeticoes": null,
+    "seed": null
+  },
+  "algoritmos": [
+    "petic",
+    "aco",
+    "sa",
+    "q-learning"
+  ],
+  "modo": "completo",
+  "celulas": [
+    {
+      "topology": "abilene",
+      "load_level": "l1",
+      "repetitions": 10
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l2",
+      "repetitions": 10
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l3",
+      "repetitions": 10
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l4",
+      "repetitions": 10
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l5",
+      "repetitions": 10
+    },
+    {
+      "topology": "abilene",
+      "load_level": "l6",
+      "repetitions": 10
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l1",
+      "repetitions": 10
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l2",
+      "repetitions": 10
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l3",
+      "repetitions": 10
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l4",
+      "repetitions": 10
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l5",
+      "repetitions": 10
+    },
+    {
+      "topology": "nobel-germany",
+      "load_level": "l6",
+      "repetitions": 10
+    },
+    {
+      "topology": "geant",
+      "load_level": "l1",
+      "repetitions": 10
+    },
+    {
+      "topology": "geant",
+      "load_level": "l2",
+      "repetitions": 10
+    },
+    {
+      "topology": "geant",
+      "load_level": "l3",
+      "repetitions": 10
+    },
+    {
+      "topology": "geant",
+      "load_level": "l4",
+      "repetitions": 10
+    },
+    {
+      "topology": "geant",
+      "load_level": "l5",
+      "repetitions": 10
+    },
+    {
+      "topology": "geant",
+      "load_level": "l6",
+      "repetitions": 10
+    }
+  ],
+  "duracao_segundos": 1223.0389564779998,
+  "celulas_executadas": 18,
+  "celulas_puladas": 0
+}

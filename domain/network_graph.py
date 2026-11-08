@@ -4,6 +4,11 @@ class NetworkGraph:
     def __init__(self):
         self._nodes: set[Node] = set()
         self._links: list[Link] = []
+        self._by_name: dict[str, Node] = {}
+        # Vizinhos na ordem de inserção dos enlaces, igual à varredura linear.
+        self._adjacency: dict[Node, list[tuple[Node, Link]]] = {}
+        # Primeiro enlace inserido para cada par de nomes, nos dois sentidos.
+        self._link_index: dict[tuple[str, str], Link] = {}
 
     @property
     def nodes(self) -> set[Node]:
@@ -15,32 +20,29 @@ class NetworkGraph:
 
     def add_node(self, node: Node) -> None:
         self._nodes.add(node)
+        self._by_name.setdefault(node.name, node)
 
     def add_nodes(self, nodes: list[Node]) -> None:
             for node in nodes:
-                self._nodes.add(node)
+                self.add_node(node)
 
     def add_link(self, link: Link) -> None:
-        self._nodes.add(link.source)
-        self._nodes.add(link.target)
+        self.add_node(link.source)
+        self.add_node(link.target)
 
         self._links.append(link)
+        self._adjacency.setdefault(link.source, []).append((link.target, link))
+        if link.target != link.source:
+            self._adjacency.setdefault(link.target, []).append((link.source, link))
+        self._link_index.setdefault((link.source.name, link.target.name), link)
+        self._link_index.setdefault((link.target.name, link.source.name), link)
 
     def get_neighbors(
         self,
         node: Node
     ) -> list[tuple[Node, Link]]:
 
-        neighbors = []
-
-        for link in self._links:
-            if link.source == node:
-                neighbors.append((link.target, link))
-
-            elif link.target == node:
-                neighbors.append((link.source, link))
-
-        return neighbors
+        return list(self._adjacency.get(node, ()))
 
     def get_links_from_path(
         self,
@@ -73,28 +75,10 @@ class NetworkGraph:
         target: str
     ) -> Link | None:
 
-        for link in self._links:
-            if (
-                link.source.name == source
-                and link.target.name == target
-            ):
-                return link
-
-            if (
-                link.source.name == target
-                and link.target.name == source
-            ):
-                return link
-
-        return None
+        return self._link_index.get((source, target))
 
     def get_links(self):
-        return self._links;
+        return self._links
 
     def get_node(self, name: str) -> Node | None:
-        for node in self._nodes:
-            if node.name == name:
-                return node
-
-        return None
-    
+        return self._by_name.get(name)

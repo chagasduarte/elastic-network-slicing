@@ -1,0 +1,70 @@
+{
+  "assinatura": {
+    "topology": "abilene",
+    "load_level": "l2",
+    "requests": 20,
+    "multiplier": 1.5,
+    "repetitions": 10,
+    "seed": 42,
+    "algorithms": [
+      "petic",
+      "aco",
+      "sa",
+      "q-learning"
+    ],
+    "parameters": {
+      "petic": {
+        "path_finder": "DijkstraPathFinder",
+        "reuse_weight": 0.0001
+      },
+      "aco": {
+        "ants_count": 10,
+        "iterations": 20,
+        "alpha": 1.0,
+        "beta": 1.0,
+        "evaporation_rate": 0.1,
+        "initial_pheromone": 1.0,
+        "pheromone_deposit": 1.0
+      },
+      "sa": {
+        "initial_temperature": 0.25,
+        "minimum_temperature": 0.001,
+        "cooling_rate": 0.9463,
+        "max_iterations": 100,
+        "neighbor_attempts": 30,
+        "max_neighbor_steps": 20,
+        "hop_weight": 0.2,
+        "avg_utilization_weight": 0.3,
+        "bottleneck_weight": 0.35,
+        "path_change_weight": 0.15
+      },
+      "q-learning": {
+        "episodes": 2000,
+        "learning_rate": 0.2,
+        "discount_factor": 1.0,
+        "epsilon_start": 1.0,
+        "epsilon_min": 0.05,
+        "epsilon_decay": 0.995,
+        "max_steps_per_episode": null,
+        "path_change_penalty": 0.15
+      }
+    },
+    "link_capacity": 800,
+    "base_bandwidth": 40,
+    "noise": 0.3,
+    "profile": {
+      "t1": 0.25,
+      "t2": 0.5,
+      "t3": 0.75,
+      "t4": 1.0
+    }
+  },
+  "duracao_segundos": 19.360368646999632,
+  "tempo_alocacao_segundos": {
+    "petic": 0.04807155198614055,
+    "aco": 5.869056759999694,
+    "sa": 3.0863553230001344,
+    "q-learning": 9.99604431199532
+  },
+  "concluida_em": "2026-10-29T22:48:52"
+}
